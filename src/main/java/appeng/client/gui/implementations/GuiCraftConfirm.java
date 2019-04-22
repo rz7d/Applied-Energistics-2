@@ -97,7 +97,7 @@ public class GuiCraftConfirm extends AEBaseGui
 
 		if( te instanceof PartCraftingTerminal )
 		{
-			this.OriginalGui = GuiBridge.GUI_CRAFTING_TERMINAL;
+			this.OriginalGui = GuiBridge.GUI_CRAFTING_AMOUNT;
 		}
 
 		if( te instanceof PartPatternTerminal )
