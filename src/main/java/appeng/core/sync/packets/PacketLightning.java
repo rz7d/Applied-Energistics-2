@@ -18,7 +18,6 @@
 
 package appeng.core.sync.packets;
 
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -34,53 +33,45 @@ import appeng.core.sync.AppEngPacket;
 import appeng.core.sync.network.INetworkInfo;
 import appeng.util.Platform;
 
+public class PacketLightning extends AppEngPacket {
 
-public class PacketLightning extends AppEngPacket
-{
+    private final double x;
+    private final double y;
+    private final double z;
 
-	private final double x;
-	private final double y;
-	private final double z;
+    // automatic.
+    public PacketLightning(final ByteBuf stream) {
+        this.x = stream.readFloat();
+        this.y = stream.readFloat();
+        this.z = stream.readFloat();
+    }
 
-	// automatic.
-	public PacketLightning( final ByteBuf stream )
-	{
-		this.x = stream.readFloat();
-		this.y = stream.readFloat();
-		this.z = stream.readFloat();
-	}
+    // api
+    public PacketLightning(final double x, final double y, final double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
 
-	// api
-	public PacketLightning( final double x, final double y, final double z )
-	{
-		this.x = x;
-		this.y = y;
-		this.z = z;
+        final ByteBuf data = Unpooled.buffer();
 
-		final ByteBuf data = Unpooled.buffer();
+        data.writeInt(this.getPacketID());
+        data.writeFloat((float) x);
+        data.writeFloat((float) y);
+        data.writeFloat((float) z);
 
-		data.writeInt( this.getPacketID() );
-		data.writeFloat( (float) x );
-		data.writeFloat( (float) y );
-		data.writeFloat( (float) z );
+        this.configureWrite(data);
+    }
 
-		this.configureWrite( data );
-	}
-
-	@Override
-	@SideOnly( Side.CLIENT )
-	public void clientPacketData( final INetworkInfo network, final AppEngPacket packet, final EntityPlayer player )
-	{
-		try
-		{
-			if( Platform.isClient() && AEConfig.instance().isEnableEffects() )
-			{
-				final LightningFX fx = new LightningFX( AppEng.proxy.getWorld(), this.x, this.y, this.z, 0.0f, 0.0f, 0.0f );
-				Minecraft.getMinecraft().effectRenderer.addEffect( fx );
-			}
-		}
-		catch( final Exception ignored )
-		{
-		}
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void clientPacketData(final INetworkInfo network, final AppEngPacket packet, final EntityPlayer player) {
+        try {
+            if (Platform.isClient() && AEConfig.instance().isEnableEffects()) {
+                final LightningFX fx = new LightningFX(AppEng.proxy.getWorld(), this.x, this.y, this.z, 0.0f, 0.0f,
+                        0.0f);
+                Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+            }
+        } catch (final Exception ignored) {
+        }
+    }
 }

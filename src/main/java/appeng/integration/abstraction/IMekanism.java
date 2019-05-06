@@ -18,24 +18,16 @@
 
 package appeng.integration.abstraction;
 
-
 import net.minecraft.item.ItemStack;
 
 import appeng.integration.IIntegrationModule;
 
+public interface IMekanism extends IIntegrationModule {
 
-public interface IMekanism extends IIntegrationModule
-{
+    default void addCrusherRecipe(ItemStack in, ItemStack out) {}
 
-	default void addCrusherRecipe( ItemStack in, ItemStack out )
-	{
-	}
+    default void addEnrichmentChamberRecipe(ItemStack in, ItemStack out) {}
 
-	default void addEnrichmentChamberRecipe( ItemStack in, ItemStack out )
-	{
-	}
-
-	class Stub extends IIntegrationModule.Stub implements IMekanism
-	{
-	}
+    class Stub extends IIntegrationModule.Stub implements IMekanism {
+    }
 }

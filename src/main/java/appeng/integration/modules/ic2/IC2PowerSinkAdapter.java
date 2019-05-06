@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.ic2;
 
-
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -33,63 +32,54 @@ import appeng.api.config.PowerUnits;
 import appeng.integration.abstraction.IC2PowerSink;
 import appeng.tile.powersink.IExternalPowerSink;
 
-
 /**
  * The real implementation of IC2PowerSink.
  */
-public class IC2PowerSinkAdapter extends BasicSink implements IC2PowerSink
-{
+public class IC2PowerSinkAdapter extends BasicSink implements IC2PowerSink {
 
-	private final IExternalPowerSink powerSink;
+    private final IExternalPowerSink powerSink;
 
-	private final Set<EnumFacing> validFaces = EnumSet.allOf( EnumFacing.class );
+    private final Set<EnumFacing> validFaces = EnumSet.allOf(EnumFacing.class);
 
-	public IC2PowerSinkAdapter( TileEntity tileEntity, IExternalPowerSink powerSink )
-	{
-		super( tileEntity, 0, Integer.MAX_VALUE );
-		this.powerSink = powerSink;
-	}
+    public IC2PowerSinkAdapter(TileEntity tileEntity, IExternalPowerSink powerSink) {
+        super(tileEntity, 0, Integer.MAX_VALUE);
+        this.powerSink = powerSink;
+    }
 
-	@Override
-	public void invalidate()
-	{
-		super.onChunkUnload();
-	}
+    @Override
+    public void invalidate() {
+        super.onChunkUnload();
+    }
 
-	@Override
-	public void onChunkUnload()
-	{
-		super.onChunkUnload();
-	}
+    @Override
+    public void onChunkUnload() {
+        super.onChunkUnload();
+    }
 
-	@Override
-	public void onLoad()
-	{
-		super.onLoad();
-	}
+    @Override
+    public void onLoad() {
+        super.onLoad();
+    }
 
-	@Override
-	public double getDemandedEnergy()
-	{
-		return this.powerSink.getExternalPowerDemand( PowerUnits.EU, Double.MAX_VALUE );
-	}
+    @Override
+    public double getDemandedEnergy() {
+        return this.powerSink.getExternalPowerDemand(PowerUnits.EU, Double.MAX_VALUE);
+    }
 
-	@Override
-	public double injectEnergy( EnumFacing directionFrom, double amount, double voltage )
-	{
-		return PowerUnits.EU.convertTo( PowerUnits.AE, this.powerSink.injectExternalPower( PowerUnits.EU, amount, Actionable.MODULATE ) );
-	}
+    @Override
+    public double injectEnergy(EnumFacing directionFrom, double amount, double voltage) {
+        return PowerUnits.EU.convertTo(PowerUnits.AE,
+                this.powerSink.injectExternalPower(PowerUnits.EU, amount, Actionable.MODULATE));
+    }
 
-	@Override
-	public boolean acceptsEnergyFrom( IEnergyEmitter iEnergyEmitter, EnumFacing side )
-	{
-		return this.validFaces.contains( side );
-	}
+    @Override
+    public boolean acceptsEnergyFrom(IEnergyEmitter iEnergyEmitter, EnumFacing side) {
+        return this.validFaces.contains(side);
+    }
 
-	@Override
-	public void setValidFaces( Set<EnumFacing> faces )
-	{
-		this.validFaces.clear();
-		this.validFaces.addAll( faces );
-	}
+    @Override
+    public void setValidFaces(Set<EnumFacing> faces) {
+        this.validFaces.clear();
+        this.validFaces.addAll(faces);
+    }
 }

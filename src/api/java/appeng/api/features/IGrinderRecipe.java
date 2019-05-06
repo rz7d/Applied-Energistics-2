@@ -23,71 +23,68 @@
 
 package appeng.api.features;
 
-
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
 
-
 /**
  * Registration Records for {@link IGrinderRegistry}
  */
-public interface IGrinderRecipe
-{
+public interface IGrinderRecipe {
 
-	/**
-	 * the current input
-	 *
-	 * @return input that the grinder will accept.
-	 */
-	@Nonnull
-	ItemStack getInput();
+    /**
+     * the current input
+     *
+     * @return input that the grinder will accept.
+     */
+    @Nonnull
+    ItemStack getInput();
 
-	/**
-	 * gets the current output
-	 *
-	 * @return output that the grinder will produce
-	 */
-	@Nonnull
-	ItemStack getOutput();
+    /**
+     * gets the current output
+     *
+     * @return output that the grinder will produce
+     */
+    @Nonnull
+    ItemStack getOutput();
 
-	/**
-	 * gets the current output
-	 *
-	 * @return output that the grinder will produce
-	 */
-	@Nonnull
-	Optional<ItemStack> getOptionalOutput();
+    /**
+     * gets the current output
+     *
+     * @return output that the grinder will produce
+     */
+    @Nonnull
+    Optional<ItemStack> getOptionalOutput();
 
-	/**
-	 * gets the current output
-	 *
-	 * @return output that the grinder will produce
-	 */
-	Optional<ItemStack> getSecondOptionalOutput();
+    /**
+     * gets the current output
+     *
+     * @return output that the grinder will produce
+     */
+    Optional<ItemStack> getSecondOptionalOutput();
 
-	/**
-	 * 0.0 - 1.0 the chance that the optional output will be generated.
-	 *
-	 * @return chance of optional output
-	 */
-	@Nonnull
-	float getOptionalChance();
+    /**
+     * 0.0 - 1.0 the chance that the optional output will be generated.
+     *
+     * @return chance of optional output
+     */
+    @Nonnull
+    float getOptionalChance();
 
-	/**
-	 * 0.0 - 1.0 the chance that the optional output will be generated.
-	 *
-	 * @return second optional output chance
-	 */
-	float getSecondOptionalChance();
+    /**
+     * 0.0 - 1.0 the chance that the optional output will be generated.
+     *
+     * @return second optional output chance
+     */
+    float getSecondOptionalChance();
 
-	/**
-	 * Amount of turns required to process the item.
-	 *
-	 * @return number of turns it takes to produce the output from the input.
-	 */
-	int getRequiredTurns();
+    /**
+     * Amount of turns required to process the item.
+     *
+     * @return number of turns it takes to produce the output from the input.
+     */
+    int getRequiredTurns();
 
 }

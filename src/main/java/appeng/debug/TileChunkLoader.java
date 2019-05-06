@@ -18,7 +18,6 @@
 
 package appeng.debug;
 
-
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -36,59 +35,48 @@ import appeng.core.AppEng;
 import appeng.tile.AEBaseTile;
 import appeng.util.Platform;
 
+public class TileChunkLoader extends AEBaseTile implements ITickable {
 
-public class TileChunkLoader extends AEBaseTile implements ITickable
-{
+    private boolean requestTicket = true;
+    private Ticket ct = null;
 
-	private boolean requestTicket = true;
-	private Ticket ct = null;
+    @Override
+    public void update() {
+        if (this.requestTicket) {
+            this.requestTicket = false;
+            this.initTicket();
+        }
+    }
 
-	@Override
-	public void update()
-	{
-		if( this.requestTicket )
-		{
-			this.requestTicket = false;
-			this.initTicket();
-		}
-	}
+    private void initTicket() {
+        if (Platform.isClient()) {
+            return;
+        }
 
-	private void initTicket()
-	{
-		if( Platform.isClient() )
-		{
-			return;
-		}
+        this.ct = ForgeChunkManager.requestTicket(AppEng.instance(), this.world, Type.NORMAL);
 
-		this.ct = ForgeChunkManager.requestTicket( AppEng.instance(), this.world, Type.NORMAL );
+        if (this.ct == null) {
+            final MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            if (server != null) {
+                final List<EntityPlayerMP> pl = server.getPlayerList().getPlayers();
+                for (final EntityPlayerMP p : pl) {
+                    p.sendMessage(new TextComponentString("Can't chunk load.."));
+                }
+            }
+            return;
+        }
 
-		if( this.ct == null )
-		{
-			final MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-			if( server != null )
-			{
-				final List<EntityPlayerMP> pl = server.getPlayerList().getPlayers();
-				for( final EntityPlayerMP p : pl )
-				{
-					p.sendMessage( new TextComponentString( "Can't chunk load.." ) );
-				}
-			}
-			return;
-		}
+        AELog.info("New Ticket " + this.ct.toString());
+        ForgeChunkManager.forceChunk(this.ct, new ChunkPos(this.pos.getX() >> 4, this.pos.getZ() >> 4));
+    }
 
-		AELog.info( "New Ticket " + this.ct.toString() );
-		ForgeChunkManager.forceChunk( this.ct, new ChunkPos( this.pos.getX() >> 4, this.pos.getZ() >> 4 ) );
-	}
+    @Override
+    public void invalidate() {
+        if (Platform.isClient()) {
+            return;
+        }
 
-	@Override
-	public void invalidate()
-	{
-		if( Platform.isClient() )
-		{
-			return;
-		}
-
-		AELog.info( "Released Ticket " + this.ct.toString() );
-		ForgeChunkManager.releaseTicket( this.ct );
-	}
+        AELog.info("Released Ticket " + this.ct.toString());
+        ForgeChunkManager.releaseTicket(this.ct);
+    }
 }

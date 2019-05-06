@@ -23,18 +23,15 @@
 
 package appeng.api.implementations.guiobjects;
 
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
 
 /**
  * Implemented on Item objects, to return objects used to manage, and interact
  * with the contents.
  */
-public interface IGuiItem
-{
+public interface IGuiItem {
 
-	IGuiItemObject getGuiObject( ItemStack is, World world, BlockPos pos );
+    IGuiItemObject getGuiObject(ItemStack is, World world, BlockPos pos);
 }

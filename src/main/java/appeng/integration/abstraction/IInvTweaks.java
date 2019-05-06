@@ -18,22 +18,17 @@
 
 package appeng.integration.abstraction;
 
-
 import net.minecraft.item.ItemStack;
 
 import appeng.integration.IIntegrationModule;
 
+public interface IInvTweaks extends IIntegrationModule {
 
-public interface IInvTweaks extends IIntegrationModule
-{
+    default int compareItems(ItemStack i, ItemStack j) {
+        throw new UnsupportedOperationException();
+    }
 
-	default int compareItems( ItemStack i, ItemStack j )
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	class Stub extends IIntegrationModule.Stub implements IInvTweaks
-	{
-	}
+    class Stub extends IIntegrationModule.Stub implements IInvTweaks {
+    }
 
 }

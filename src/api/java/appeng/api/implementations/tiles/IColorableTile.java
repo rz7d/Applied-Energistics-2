@@ -23,17 +23,14 @@
 
 package appeng.api.implementations.tiles;
 
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 
 import appeng.api.util.AEColor;
 
+public interface IColorableTile {
 
-public interface IColorableTile
-{
+    AEColor getColor();
 
-	AEColor getColor();
-
-	boolean recolourBlock( EnumFacing side, AEColor colour, EntityPlayer who );
+    boolean recolourBlock(EnumFacing side, AEColor colour, EntityPlayer who);
 }

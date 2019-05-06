@@ -18,7 +18,6 @@
 
 package appeng.util;
 
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -32,54 +31,49 @@ import appeng.util.inv.AdaptorItemHandlerPlayerInv;
 import appeng.util.inv.IInventoryDestination;
 import appeng.util.inv.ItemSlot;
 
-
 /**
- * Universal Facade for other inventories. Used to conveniently interact with various types of inventories. This is not
- * used for
- * actually monitoring an inventory. It is just for insertion and extraction, and is primarily used by import/export
- * buses.
+ * Universal Facade for other inventories. Used to conveniently interact with
+ * various types of inventories. This is not used for actually monitoring an
+ * inventory. It is just for insertion and extraction, and is primarily used by
+ * import/export buses.
  */
-public abstract class InventoryAdaptor implements Iterable<ItemSlot>
-{
-	public static InventoryAdaptor getAdaptor( final TileEntity te, final EnumFacing d )
-	{
-		if( te != null && te.hasCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d ) )
-		{
-			// Attempt getting an IItemHandler for the given side via caps
-			IItemHandler itemHandler = te.getCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d );
-			if( itemHandler != null )
-			{
-				return new AdaptorItemHandler( itemHandler );
-			}
-		}
-		return null;
-	}
+public abstract class InventoryAdaptor implements Iterable<ItemSlot> {
+    public static InventoryAdaptor getAdaptor(final TileEntity te, final EnumFacing d) {
+        if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d)) {
+            // Attempt getting an IItemHandler for the given side via caps
+            IItemHandler itemHandler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, d);
+            if (itemHandler != null) {
+                return new AdaptorItemHandler(itemHandler);
+            }
+        }
+        return null;
+    }
 
-	public static InventoryAdaptor getAdaptor( final EntityPlayer te )
-	{
-		if( te != null )
-		{
-			return new AdaptorItemHandlerPlayerInv( te );
-		}
-		return null;
-	}
+    public static InventoryAdaptor getAdaptor(final EntityPlayer te) {
+        if (te != null) {
+            return new AdaptorItemHandlerPlayerInv(te);
+        }
+        return null;
+    }
 
-	// return what was extracted.
-	public abstract ItemStack removeItems( int amount, ItemStack filter, IInventoryDestination destination );
+    // return what was extracted.
+    public abstract ItemStack removeItems(int amount, ItemStack filter, IInventoryDestination destination);
 
-	public abstract ItemStack simulateRemove( int amount, ItemStack filter, IInventoryDestination destination );
+    public abstract ItemStack simulateRemove(int amount, ItemStack filter, IInventoryDestination destination);
 
-	// return what was extracted.
-	public abstract ItemStack removeSimilarItems( int amount, ItemStack filter, FuzzyMode fuzzyMode, IInventoryDestination destination );
+    // return what was extracted.
+    public abstract ItemStack removeSimilarItems(int amount, ItemStack filter, FuzzyMode fuzzyMode,
+            IInventoryDestination destination);
 
-	public abstract ItemStack simulateSimilarRemove( int amount, ItemStack filter, FuzzyMode fuzzyMode, IInventoryDestination destination );
+    public abstract ItemStack simulateSimilarRemove(int amount, ItemStack filter, FuzzyMode fuzzyMode,
+            IInventoryDestination destination);
 
-	// return what isn't used...
-	public abstract ItemStack addItems( ItemStack toBeAdded );
+    // return what isn't used...
+    public abstract ItemStack addItems(ItemStack toBeAdded);
 
-	public abstract ItemStack simulateAdd( ItemStack toBeSimulated );
+    public abstract ItemStack simulateAdd(ItemStack toBeSimulated);
 
-	public abstract boolean containsItems();
+    public abstract boolean containsItems();
 
-	public abstract boolean hasSlots();
+    public abstract boolean hasSlots();
 }

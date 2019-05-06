@@ -23,40 +23,38 @@
 
 package appeng.api.util;
 
-
 import net.minecraft.util.EnumFacing;
-
 
 /**
  * Nearly all of AE's Tile Entities implement IOrientable.
  *
- * and it can be used to manipulate the direction of some machines, most of these orientations are purely visual.
+ * and it can be used to manipulate the direction of some machines, most of
+ * these orientations are purely visual.
  *
  * AE also responds to Block.rotateBlock
  */
-public interface IOrientable
-{
+public interface IOrientable {
 
-	/**
-	 * @return true or false, if the tile rotation is meaningful, or even changeable
-	 */
-	boolean canBeRotated();
+    /**
+     * @return true or false, if the tile rotation is meaningful, or even changeable
+     */
+    boolean canBeRotated();
 
-	/**
-	 * @return the direction the tile is facing
-	 */
-	EnumFacing getForward();
+    /**
+     * @return the direction the tile is facing
+     */
+    EnumFacing getForward();
 
-	/**
-	 * @return the direction top of the tile
-	 */
-	EnumFacing getUp();
+    /**
+     * @return the direction top of the tile
+     */
+    EnumFacing getUp();
 
-	/**
-	 * Update the orientation
-	 *
-	 * @param Forward new forward direction
-	 * @param Up new upwards direction
-	 */
-	void setOrientation( EnumFacing Forward, EnumFacing Up );
+    /**
+     * Update the orientation
+     *
+     * @param Forward new forward direction
+     * @param Up      new upwards direction
+     */
+    void setOrientation(EnumFacing Forward, EnumFacing Up);
 }

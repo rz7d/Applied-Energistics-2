@@ -18,19 +18,15 @@
 
 package appeng.integration.modules.jei;
 
-
 import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.IRecipeWrapperFactory;
 
 import appeng.api.features.IInscriberRecipe;
 
-
-class InscriberRecipeHandler implements IRecipeWrapperFactory<IInscriberRecipe>
-{
-	@Override
-	public IRecipeWrapper getRecipeWrapper( IInscriberRecipe recipe )
-	{
-		return new InscriberRecipeWrapper( recipe );
-	}
+class InscriberRecipeHandler implements IRecipeWrapperFactory<IInscriberRecipe> {
+    @Override
+    public IRecipeWrapper getRecipeWrapper(IInscriberRecipe recipe) {
+        return new InscriberRecipeWrapper(recipe);
+    }
 
 }

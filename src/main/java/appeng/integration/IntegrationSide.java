@@ -18,8 +18,8 @@
 
 package appeng.integration;
 
-
-enum IntegrationSide
-{
-	CLIENT, SERVER, BOTH
+enum IntegrationSide {
+    CLIENT,
+    SERVER,
+    BOTH
 }

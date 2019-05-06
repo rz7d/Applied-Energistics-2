@@ -18,16 +18,12 @@
 
 package appeng.decorative.solid;
 
-
 import net.minecraft.block.material.Material;
 
 import appeng.block.AEDecorativeBlock;
 
-
-public final class BlockFluix extends AEDecorativeBlock
-{
-	public BlockFluix()
-	{
-		super( Material.ROCK );
-	}
+public final class BlockFluix extends AEDecorativeBlock {
+    public BlockFluix() {
+        super(Material.ROCK);
+    }
 }

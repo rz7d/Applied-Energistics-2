@@ -18,7 +18,6 @@
 
 package appeng.core;
 
-
 import java.util.Optional;
 
 import net.minecraft.creativetab.CreativeTabs;
@@ -32,50 +31,42 @@ import appeng.api.definitions.IItemDefinition;
 import appeng.api.definitions.IItems;
 import appeng.api.definitions.IMaterials;
 
+public final class CreativeTab extends CreativeTabs {
+    public static CreativeTab instance = null;
 
-public final class CreativeTab extends CreativeTabs
-{
-	public static CreativeTab instance = null;
+    public CreativeTab() {
+        super("appliedenergistics2");
+    }
 
-	public CreativeTab()
-	{
-		super( "appliedenergistics2" );
-	}
+    static void init() {
+        instance = new CreativeTab();
+    }
 
-	static void init()
-	{
-		instance = new CreativeTab();
-	}
+    @Override
+    public ItemStack getTabIconItem() {
+        return this.getIconItemStack();
+    }
 
-	@Override
-	public ItemStack getTabIconItem()
-	{
-		return this.getIconItemStack();
-	}
+    @Override
+    public ItemStack getIconItemStack() {
+        final IDefinitions definitions = AEApi.instance().definitions();
+        final IBlocks blocks = definitions.blocks();
+        final IItems items = definitions.items();
+        final IMaterials materials = definitions.materials();
 
-	@Override
-	public ItemStack getIconItemStack()
-	{
-		final IDefinitions definitions = AEApi.instance().definitions();
-		final IBlocks blocks = definitions.blocks();
-		final IItems items = definitions.items();
-		final IMaterials materials = definitions.materials();
+        return this.findFirst(blocks.controller(), blocks.chest(), blocks.cellWorkbench(), blocks.fluixBlock(),
+                items.cell1k(), items.networkTool(),
+                materials.fluixCrystal(), materials.certusQuartzCrystal(), materials.skyDust());
+    }
 
-		return this.findFirst( blocks.controller(), blocks.chest(), blocks.cellWorkbench(), blocks.fluixBlock(), items.cell1k(), items.networkTool(),
-				materials.fluixCrystal(), materials.certusQuartzCrystal(), materials.skyDust() );
-	}
+    private ItemStack findFirst(final IItemDefinition... choices) {
+        for (final IItemDefinition definition : choices) {
+            Optional<ItemStack> maybeIs = definition.maybeStack(1);
+            if (maybeIs.isPresent()) {
+                return maybeIs.get();
+            }
+        }
 
-	private ItemStack findFirst( final IItemDefinition... choices )
-	{
-		for( final IItemDefinition definition : choices )
-		{
-			Optional<ItemStack> maybeIs = definition.maybeStack( 1 );
-			if( maybeIs.isPresent() )
-			{
-				return maybeIs.get();
-			}
-		}
-
-		return new ItemStack( Blocks.CHEST );
-	}
+        return new ItemStack(Blocks.CHEST);
+    }
 }

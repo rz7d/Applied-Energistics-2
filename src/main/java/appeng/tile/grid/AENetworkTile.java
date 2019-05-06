@@ -18,7 +18,6 @@
 
 package appeng.tile.grid;
 
-
 import net.minecraft.nbt.NBTTagCompound;
 
 import appeng.api.networking.IGridNode;
@@ -30,93 +29,78 @@ import appeng.me.helpers.AENetworkProxy;
 import appeng.me.helpers.IGridProxyable;
 import appeng.tile.AEBaseTile;
 
+public class AENetworkTile extends AEBaseTile implements IActionHost, IGridProxyable {
 
-public class AENetworkTile extends AEBaseTile implements IActionHost, IGridProxyable
-{
+    private final AENetworkProxy gridProxy = this.createProxy();
 
-	private final AENetworkProxy gridProxy = this.createProxy();
+    @Override
+    public void readFromNBT(final NBTTagCompound data) {
+        super.readFromNBT(data);
+        this.getProxy().readFromNBT(data);
+    }
 
-	@Override
-	public void readFromNBT( final NBTTagCompound data )
-	{
-		super.readFromNBT( data );
-		this.getProxy().readFromNBT( data );
-	}
+    @Override
+    public NBTTagCompound writeToNBT(final NBTTagCompound data) {
+        super.writeToNBT(data);
+        this.getProxy().writeToNBT(data);
+        return data;
+    }
 
-	@Override
-	public NBTTagCompound writeToNBT( final NBTTagCompound data )
-	{
-		super.writeToNBT( data );
-		this.getProxy().writeToNBT( data );
-		return data;
-	}
+    protected AENetworkProxy createProxy() {
+        return new AENetworkProxy(this, "proxy", this.getItemFromTile(this), true);
+    }
 
-	protected AENetworkProxy createProxy()
-	{
-		return new AENetworkProxy( this, "proxy", this.getItemFromTile( this ), true );
-	}
+    @Override
+    public IGridNode getGridNode(final AEPartLocation dir) {
+        return this.getProxy().getNode();
+    }
 
-	@Override
-	public IGridNode getGridNode( final AEPartLocation dir )
-	{
-		return this.getProxy().getNode();
-	}
+    @Override
+    public AECableType getCableConnectionType(final AEPartLocation dir) {
+        return AECableType.SMART;
+    }
 
-	@Override
-	public AECableType getCableConnectionType( final AEPartLocation dir )
-	{
-		return AECableType.SMART;
-	}
+    @Override
+    public void onChunkUnload() {
+        super.onChunkUnload();
+        this.getProxy().onChunkUnload();
+    }
 
-	@Override
-	public void onChunkUnload()
-	{
-		super.onChunkUnload();
-		this.getProxy().onChunkUnload();
-	}
+    @Override
+    public void onReady() {
+        super.onReady();
+        this.getProxy().onReady();
+    }
 
-	@Override
-	public void onReady()
-	{
-		super.onReady();
-		this.getProxy().onReady();
-	}
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        this.getProxy().invalidate();
+    }
 
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
-		this.getProxy().invalidate();
-	}
+    @Override
+    public void validate() {
+        super.validate();
+        this.getProxy().validate();
+    }
 
-	@Override
-	public void validate()
-	{
-		super.validate();
-		this.getProxy().validate();
-	}
+    @Override
+    public AENetworkProxy getProxy() {
+        return this.gridProxy;
+    }
 
-	@Override
-	public AENetworkProxy getProxy()
-	{
-		return this.gridProxy;
-	}
+    @Override
+    public DimensionalCoord getLocation() {
+        return new DimensionalCoord(this);
+    }
 
-	@Override
-	public DimensionalCoord getLocation()
-	{
-		return new DimensionalCoord( this );
-	}
+    @Override
+    public void gridChanged() {
 
-	@Override
-	public void gridChanged()
-	{
+    }
 
-	}
-
-	@Override
-	public IGridNode getActionableNode()
-	{
-		return this.getProxy().getNode();
-	}
+    @Override
+    public IGridNode getActionableNode() {
+        return this.getProxy().getNode();
+    }
 }

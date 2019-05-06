@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.theoneprobe.part;
 
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -31,41 +30,32 @@ import appeng.api.implementations.IPowerChannelState;
 import appeng.api.parts.IPart;
 import appeng.integration.modules.theoneprobe.TheOneProbeText;
 
+public class PowerStateInfoProvider implements IPartProbInfoProvider {
 
-public class PowerStateInfoProvider implements IPartProbInfoProvider
-{
+    @Override
+    public void addProbeInfo(IPart part, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world,
+            IBlockState blockState, IProbeHitData data) {
+        if (part instanceof IPowerChannelState) {
+            final IPowerChannelState state = (IPowerChannelState) part;
+            final String tooltip = this.getToolTip(state.isActive(), state.isPowered());
 
-	@Override
-	public void addProbeInfo( IPart part, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data )
-	{
-		if( part instanceof IPowerChannelState )
-		{
-			final IPowerChannelState state = (IPowerChannelState) part;
-			final String tooltip = this.getToolTip( state.isActive(), state.isPowered() );
+            probeInfo.text(tooltip);
+        }
 
-			probeInfo.text( tooltip );
-		}
+    }
 
-	}
+    private String getToolTip(final boolean isActive, final boolean isPowered) {
+        final String result;
 
-	private String getToolTip( final boolean isActive, final boolean isPowered )
-	{
-		final String result;
+        if (isActive && isPowered) {
+            result = TheOneProbeText.DEVICE_ONLINE.getLocal();
+        } else if (isPowered) {
+            result = TheOneProbeText.DEVICE_MISSING_CHANNEL.getLocal();
+        } else {
+            result = TheOneProbeText.DEVICE_OFFLINE.getLocal();
+        }
 
-		if( isActive && isPowered )
-		{
-			result = TheOneProbeText.DEVICE_ONLINE.getLocal();
-		}
-		else if( isPowered )
-		{
-			result = TheOneProbeText.DEVICE_MISSING_CHANNEL.getLocal();
-		}
-		else
-		{
-			result = TheOneProbeText.DEVICE_OFFLINE.getLocal();
-		}
-
-		return result;
-	}
+        return result;
+    }
 
 }

@@ -18,32 +18,21 @@
 
 package appeng.integration.abstraction;
 
-
 import java.util.Set;
 
 import net.minecraft.util.EnumFacing;
 
-
 /**
- * Provides an abstraction for the IC2 Basic Sink so it can be stubbed out easily when the integration is disabled, or
- * if the IC2 API is not available.
+ * Provides an abstraction for the IC2 Basic Sink so it can be stubbed out
+ * easily when the integration is disabled, or if the IC2 API is not available.
  */
-public interface IC2PowerSink
-{
+public interface IC2PowerSink {
 
-	default void invalidate()
-	{
-	}
+    default void invalidate() {}
 
-	default void onChunkUnload()
-	{
-	}
+    default void onChunkUnload() {}
 
-	default void onLoad()
-	{
-	}
+    default void onLoad() {}
 
-	default void setValidFaces( Set<EnumFacing> faces )
-	{
-	}
+    default void setValidFaces(Set<EnumFacing> faces) {}
 }

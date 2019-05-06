@@ -18,7 +18,6 @@
 
 package appeng.block.misc;
 
-
 import javax.annotation.Nullable;
 
 import net.minecraft.block.material.Material;
@@ -35,33 +34,28 @@ import appeng.core.sync.GuiBridge;
 import appeng.tile.misc.TileCondenser;
 import appeng.util.Platform;
 
+public class BlockCondenser extends AEBaseTileBlock {
 
-public class BlockCondenser extends AEBaseTileBlock
-{
+    public BlockCondenser() {
+        super(Material.IRON);
+    }
 
-	public BlockCondenser()
-	{
-		super( Material.IRON );
-	}
+    @Override
+    public boolean onActivated(final World w, final BlockPos pos, final EntityPlayer player, final EnumHand hand,
+            final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY,
+            final float hitZ) {
+        if (player.isSneaking()) {
+            return false;
+        }
 
-	@Override
-	public boolean onActivated( final World w, final BlockPos pos, final EntityPlayer player, final EnumHand hand, final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY, final float hitZ )
-	{
-		if( player.isSneaking() )
-		{
-			return false;
-		}
+        if (Platform.isServer()) {
+            final TileCondenser tc = this.getTileEntity(w, pos);
+            if (tc != null && !player.isSneaking()) {
+                Platform.openGUI(player, tc, AEPartLocation.fromFacing(side), GuiBridge.GUI_CONDENSER);
+                return true;
+            }
+        }
 
-		if( Platform.isServer() )
-		{
-			final TileCondenser tc = this.getTileEntity( w, pos );
-			if( tc != null && !player.isSneaking() )
-			{
-				Platform.openGUI( player, tc, AEPartLocation.fromFacing( side ), GuiBridge.GUI_CONDENSER );
-				return true;
-			}
-		}
-
-		return true;
-	}
+        return true;
+    }
 }

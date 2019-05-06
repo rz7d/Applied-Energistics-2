@@ -18,14 +18,12 @@
 
 package appeng.api.features;
 
-
 import java.util.Collection;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
-
 
 /**
  * Lets you manipulate Inscriber Recipes, by adding or editing existing ones.
@@ -34,64 +32,64 @@ import net.minecraft.item.ItemStack;
  * @version rv5
  * @since rv2
  */
-public interface IInscriberRegistry
-{
-	/**
-	 * Extensible way to create an inscriber recipe.
-	 *
-	 * @return builder for inscriber recipes
-	 */
-	@Nonnull
-	IInscriberRecipeBuilder builder();
+public interface IInscriberRegistry {
+    /**
+     * Extensible way to create an inscriber recipe.
+     *
+     * @return builder for inscriber recipes
+     */
+    @Nonnull
+    IInscriberRecipeBuilder builder();
 
-	/**
-	 * An immutable copy of currently registered recipes.
-	 *
-	 * Use the provided methods to actually modify the inscriber recipes.
-	 *
-	 * @see IInscriberRegistry#addRecipe(IInscriberRecipe)
-	 * @see IInscriberRegistry#removeRecipe(IInscriberRecipe)
-	 *
-	 * @return currentlyRegisteredRecipes
-	 */
-	@Nonnull
-	Collection<IInscriberRecipe> getRecipes();
+    /**
+     * An immutable copy of currently registered recipes.
+     *
+     * Use the provided methods to actually modify the inscriber recipes.
+     *
+     * @see IInscriberRegistry#addRecipe(IInscriberRecipe)
+     * @see IInscriberRegistry#removeRecipe(IInscriberRecipe)
+     *
+     * @return currentlyRegisteredRecipes
+     */
+    @Nonnull
+    Collection<IInscriberRecipe> getRecipes();
 
-	/**
-	 * Optional items which are used in the top or bottom slot.
-	 *
-	 * @return set of all optional items
-	 */
-	@Nonnull
-	Set<ItemStack> getOptionals();
+    /**
+     * Optional items which are used in the top or bottom slot.
+     *
+     * @return set of all optional items
+     */
+    @Nonnull
+    Set<ItemStack> getOptionals();
 
-	/**
-	 * Get all registered items which are valid inputs.
-	 *
-	 * @return set of all input items
-	 */
-	@Nonnull
-	Set<ItemStack> getInputs();
+    /**
+     * Get all registered items which are valid inputs.
+     *
+     * @return set of all input items
+     */
+    @Nonnull
+    Set<ItemStack> getInputs();
 
-	/**
-	 * add a new recipe the easy way, duplicates will not be added.
-	 * Added recipes will be automatically added to the optionals and inputs.
-	 *
-	 * @param recipe new recipe
-	 * 
-	 * @return true, when successfully added
-	 *
-	 * @throws IllegalArgumentException if null is added
-	 */
-	boolean addRecipe( IInscriberRecipe recipe );
+    /**
+     * add a new recipe the easy way, duplicates will not be added. Added recipes
+     * will be automatically added to the optionals and inputs.
+     *
+     * @param recipe new recipe
+     * 
+     * @return true, when successfully added
+     *
+     * @throws IllegalArgumentException if null is added
+     */
+    boolean addRecipe(IInscriberRecipe recipe);
 
-	/**
-	 * Removes all equal recipes from the registry.
-	 * 
-	 * @param toBeRemovedRecipe to be removed recipe, can be null, makes just no sense.
-	 * 
-	 * @return true, when successfully removed
-	 */
-	boolean removeRecipe( IInscriberRecipe toBeRemovedRecipe );
+    /**
+     * Removes all equal recipes from the registry.
+     * 
+     * @param toBeRemovedRecipe to be removed recipe, can be null, makes just no
+     *                          sense.
+     * 
+     * @return true, when successfully removed
+     */
+    boolean removeRecipe(IInscriberRecipe toBeRemovedRecipe);
 
 }

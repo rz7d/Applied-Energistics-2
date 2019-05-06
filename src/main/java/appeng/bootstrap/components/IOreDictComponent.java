@@ -18,14 +18,11 @@
 
 package appeng.bootstrap.components;
 
-
 import net.minecraftforge.fml.relauncher.Side;
 
 import appeng.bootstrap.IBootstrapComponent;
 
-
 @FunctionalInterface
-public interface IOreDictComponent extends IBootstrapComponent
-{
-	void oreRegistration( Side side );
+public interface IOreDictComponent extends IBootstrapComponent {
+    void oreRegistration(Side side);
 }

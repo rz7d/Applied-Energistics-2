@@ -18,17 +18,13 @@
 
 package appeng.block.networking;
 
-
 import net.minecraft.block.material.Material;
 
 import appeng.block.AEBaseTileBlock;
 
+public class BlockEnergyAcceptor extends AEBaseTileBlock {
 
-public class BlockEnergyAcceptor extends AEBaseTileBlock
-{
-
-	public BlockEnergyAcceptor()
-	{
-		super( Material.IRON );
-	}
+    public BlockEnergyAcceptor() {
+        super(Material.IRON);
+    }
 }

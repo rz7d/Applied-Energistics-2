@@ -18,7 +18,6 @@
 
 package appeng.decorative.solid;
 
-
 import java.util.EnumSet;
 
 import net.minecraft.block.material.Material;
@@ -36,81 +35,70 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import appeng.block.AEBaseBlock;
 import appeng.helpers.AEGlassMaterial;
 
+public class BlockQuartzGlass extends AEBaseBlock {
 
-public class BlockQuartzGlass extends AEBaseBlock
-{
+    // This unlisted property is used to determine the actual block that should be
+    // rendered
+    public static final UnlistedGlassStateProperty GLASS_STATE = new UnlistedGlassStateProperty();
 
-	// This unlisted property is used to determine the actual block that should be rendered
-	public static final UnlistedGlassStateProperty GLASS_STATE = new UnlistedGlassStateProperty();
+    public BlockQuartzGlass() {
+        super(Material.GLASS);
+        this.setLightOpacity(0);
+        this.setOpaque(false);
+    }
 
-	public BlockQuartzGlass()
-	{
-		super( Material.GLASS );
-		this.setLightOpacity( 0 );
-		this.setOpaque( false );
-	}
+    @Override
+    protected BlockStateContainer createBlockState() {
+        IProperty[] listedProperties = new IProperty[0];
+        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { GLASS_STATE };
+        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
+    }
 
-	@Override
-	protected BlockStateContainer createBlockState()
-	{
-		IProperty[] listedProperties = new IProperty[0];
-		IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { GLASS_STATE };
-		return new ExtendedBlockState( this, listedProperties, unlistedProperties );
-	}
+    @Override
+    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 
-	@Override
-	public IBlockState getExtendedState( IBlockState state, IBlockAccess world, BlockPos pos )
-	{
+        EnumSet<EnumFacing> flushWith = EnumSet.noneOf(EnumFacing.class);
+        // Test every direction for another glass block
+        for (EnumFacing facing : EnumFacing.values()) {
+            if (isGlassBlock(world, pos, facing)) {
+                flushWith.add(facing);
+            }
+        }
 
-		EnumSet<EnumFacing> flushWith = EnumSet.noneOf( EnumFacing.class );
-		// Test every direction for another glass block
-		for( EnumFacing facing : EnumFacing.values() )
-		{
-			if( isGlassBlock( world, pos, facing ) )
-			{
-				flushWith.add( facing );
-			}
-		}
+        GlassState glassState = new GlassState(pos.getX(), pos.getY(), pos.getZ(), flushWith);
 
-		GlassState glassState = new GlassState( pos.getX(), pos.getY(), pos.getZ(), flushWith );
+        IExtendedBlockState extState = (IExtendedBlockState) state;
 
-		IExtendedBlockState extState = (IExtendedBlockState) state;
+        return extState.withProperty(GLASS_STATE, glassState);
+    }
 
-		return extState.withProperty( GLASS_STATE, glassState );
-	}
+    private static boolean isGlassBlock(IBlockAccess world, BlockPos pos, EnumFacing facing) {
+        return world.getBlockState(pos.offset(facing)).getBlock() instanceof BlockQuartzGlass;
+    }
 
-	private static boolean isGlassBlock( IBlockAccess world, BlockPos pos, EnumFacing facing )
-	{
-		return world.getBlockState( pos.offset( facing ) ).getBlock() instanceof BlockQuartzGlass;
-	}
+    @Override
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
 
-	@Override
-	public BlockRenderLayer getBlockLayer()
-	{
-		return BlockRenderLayer.CUTOUT;
-	}
+    @Override
+    public boolean shouldSideBeRendered(final IBlockState state, final IBlockAccess w, final BlockPos pos,
+            final EnumFacing side) {
+        BlockPos adjacentPos = pos.offset(side);
 
-	@Override
-	public boolean shouldSideBeRendered( final IBlockState state, final IBlockAccess w, final BlockPos pos, final EnumFacing side )
-	{
-		BlockPos adjacentPos = pos.offset( side );
+        final Material mat = w.getBlockState(adjacentPos).getMaterial();
 
-		final Material mat = w.getBlockState( adjacentPos ).getMaterial();
+        if (mat == Material.GLASS || mat == AEGlassMaterial.INSTANCE) {
+            if (w.getBlockState(adjacentPos).getRenderType() == this.getRenderType(state)) {
+                return false;
+            }
+        }
 
-		if( mat == Material.GLASS || mat == AEGlassMaterial.INSTANCE )
-		{
-			if( w.getBlockState( adjacentPos ).getRenderType() == this.getRenderType( state ) )
-			{
-				return false;
-			}
-		}
+        return w.getBlockState(pos).shouldSideBeRendered(w, adjacentPos, side);
+    }
 
-		return w.getBlockState( pos ).shouldSideBeRendered( w, adjacentPos, side );
-	}
-
-	@Override
-	public boolean isFullCube( IBlockState state )
-	{
-		return false;
-	}
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 }

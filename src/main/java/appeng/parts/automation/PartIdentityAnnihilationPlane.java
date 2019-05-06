@@ -18,7 +18,6 @@
 
 package appeng.parts.automation;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,77 +37,64 @@ import appeng.api.parts.IPartModel;
 import appeng.api.util.AEPartLocation;
 import appeng.items.parts.PartModels;
 
+public class PartIdentityAnnihilationPlane extends PartAnnihilationPlane {
 
-public class PartIdentityAnnihilationPlane extends PartAnnihilationPlane
-{
+    private static final PlaneModels MODELS = new PlaneModels("part/identity_annihilation_plane_",
+            "part/identity_annihilation_plane_on_");
 
-	private static final PlaneModels MODELS = new PlaneModels( "part/identity_annihilation_plane_", "part/identity_annihilation_plane_on_" );
+    @PartModels
+    public static List<IPartModel> getModels() {
+        return MODELS.getModels();
+    }
 
-	@PartModels
-	public static List<IPartModel> getModels()
-	{
-		return MODELS.getModels();
-	}
+    private static final float SILK_TOUCH_FACTOR = 16;
 
-	private static final float SILK_TOUCH_FACTOR = 16;
+    public PartIdentityAnnihilationPlane(final ItemStack is) {
+        super(is);
+    }
 
-	public PartIdentityAnnihilationPlane( final ItemStack is )
-	{
-		super( is );
-	}
+    @Override
+    protected boolean isAnnihilationPlane(final TileEntity blockTileEntity, final AEPartLocation side) {
+        if (blockTileEntity instanceof IPartHost) {
+            final IPart p = ((IPartHost) blockTileEntity).getPart(side);
+            return p != null && p.getClass() == this.getClass();
+        }
+        return false;
+    }
 
-	@Override
-	protected boolean isAnnihilationPlane( final TileEntity blockTileEntity, final AEPartLocation side )
-	{
-		if( blockTileEntity instanceof IPartHost )
-		{
-			final IPart p = ( (IPartHost) blockTileEntity ).getPart( side );
-			return p != null && p.getClass() == this.getClass();
-		}
-		return false;
-	}
+    @Override
+    protected float calculateEnergyUsage(final WorldServer w, final BlockPos pos, final List<ItemStack> items) {
+        final float requiredEnergy = super.calculateEnergyUsage(w, pos, items);
 
-	@Override
-	protected float calculateEnergyUsage( final WorldServer w, final BlockPos pos, final List<ItemStack> items )
-	{
-		final float requiredEnergy = super.calculateEnergyUsage( w, pos, items );
+        return requiredEnergy * SILK_TOUCH_FACTOR;
+    }
 
-		return requiredEnergy * SILK_TOUCH_FACTOR;
-	}
+    @Override
+    protected List<ItemStack> obtainBlockDrops(final WorldServer w, final BlockPos pos) {
+        final FakePlayer fakePlayer = FakePlayerFactory.getMinecraft(w);
+        final IBlockState state = w.getBlockState(pos);
 
-	@Override
-	protected List<ItemStack> obtainBlockDrops( final WorldServer w, final BlockPos pos )
-	{
-		final FakePlayer fakePlayer = FakePlayerFactory.getMinecraft( w );
-		final IBlockState state = w.getBlockState( pos );
+        if (state.getBlock().canSilkHarvest(w, pos, state, fakePlayer)) {
+            final List<ItemStack> out = new ArrayList<>(1);
+            final Item item = Item.getItemFromBlock(state.getBlock());
 
-		if( state.getBlock().canSilkHarvest( w, pos, state, fakePlayer ) )
-		{
-			final List<ItemStack> out = new ArrayList<>( 1 );
-			final Item item = Item.getItemFromBlock( state.getBlock() );
+            if (item != Items.AIR) {
+                int meta = 0;
+                if (item.getHasSubtypes()) {
+                    meta = state.getBlock().getMetaFromState(state);
+                }
+                final ItemStack itemstack = new ItemStack(item, 1, meta);
+                out.add(itemstack);
+            }
+            return out;
+        } else {
+            return super.obtainBlockDrops(w, pos);
+        }
+    }
 
-			if( item != Items.AIR )
-			{
-				int meta = 0;
-				if( item.getHasSubtypes() )
-				{
-					meta = state.getBlock().getMetaFromState( state );
-				}
-				final ItemStack itemstack = new ItemStack( item, 1, meta );
-				out.add( itemstack );
-			}
-			return out;
-		}
-		else
-		{
-			return super.obtainBlockDrops( w, pos );
-		}
-	}
-
-	@Override
-	public IPartModel getStaticModels()
-	{
-		return MODELS.getModel( this.getConnections(), this.isPowered(), this.isActive() );
-	}
+    @Override
+    public IPartModel getStaticModels() {
+        return MODELS.getModel(this.getConnections(), this.isPowered(), this.isActive());
+    }
 
 }

@@ -18,7 +18,6 @@
 
 package appeng.recipes.ores;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,66 +25,55 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
+public class OreDictionaryHandler {
 
-public class OreDictionaryHandler
-{
+    public static final OreDictionaryHandler INSTANCE = new OreDictionaryHandler();
 
-	public static final OreDictionaryHandler INSTANCE = new OreDictionaryHandler();
+    private final List<IOreListener> oreListeners = new ArrayList<>();
 
-	private final List<IOreListener> oreListeners = new ArrayList<>();
+    @SubscribeEvent
+    public void onOreDictionaryRegister(final OreDictionary.OreRegisterEvent event) {
+        if (event.getName() == null || event.getOre().isEmpty()) {
+            return;
+        }
 
-	@SubscribeEvent
-	public void onOreDictionaryRegister( final OreDictionary.OreRegisterEvent event )
-	{
-		if( event.getName() == null || event.getOre().isEmpty() )
-		{
-			return;
-		}
+        if (this.shouldCare(event.getName())) {
+            for (final IOreListener v : this.oreListeners) {
+                v.oreRegistered(event.getName(), event.getOre());
+            }
+        }
+    }
 
-		if( this.shouldCare( event.getName() ) )
-		{
-			for( final IOreListener v : this.oreListeners )
-			{
-				v.oreRegistered( event.getName(), event.getOre() );
-			}
-		}
-	}
+    /**
+     * Just limit what items are sent to the final listeners, I got sick of strange
+     * items showing up...
+     *
+     * @param name name about cared item
+     *
+     * @return true if it should care
+     */
+    private boolean shouldCare(final String name) {
+        return true;
+    }
 
-	/**
-	 * Just limit what items are sent to the final listeners, I got sick of strange items showing up...
-	 *
-	 * @param name name about cared item
-	 *
-	 * @return true if it should care
-	 */
-	private boolean shouldCare( final String name )
-	{
-		return true;
-	}
+    /**
+     * Adds a new IOreListener and immediately notifies it of any previous ores, any
+     * ores added latter will be added at that point.
+     *
+     * @param n to be added ore listener
+     */
+    public void observe(final IOreListener n) {
+        this.oreListeners.add(n);
 
-	/**
-	 * Adds a new IOreListener and immediately notifies it of any previous ores, any ores added latter will be added at
-	 * that point.
-	 *
-	 * @param n to be added ore listener
-	 */
-	public void observe( final IOreListener n )
-	{
-		this.oreListeners.add( n );
-
-		// notify the listener of any ore already in existence.
-		for( final String name : OreDictionary.getOreNames() )
-		{
-			if( name != null && this.shouldCare( name ) )
-			{
-				for( final ItemStack item : OreDictionary.getOres( name ) )
-				{
-					if( !item.isEmpty() )
-					{
-						n.oreRegistered( name, item );
-					}
-				}
-			}
-		}
-	}
+        // notify the listener of any ore already in existence.
+        for (final String name : OreDictionary.getOreNames()) {
+            if (name != null && this.shouldCare(name)) {
+                for (final ItemStack item : OreDictionary.getOres(name)) {
+                    if (!item.isEmpty()) {
+                        n.oreRegistered(name, item);
+                    }
+                }
+            }
+        }
+    }
 }

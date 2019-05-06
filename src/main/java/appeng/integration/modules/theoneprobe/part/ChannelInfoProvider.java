@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.theoneprobe.part;
 
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -33,34 +32,29 @@ import appeng.integration.modules.theoneprobe.TheOneProbeText;
 import appeng.parts.networking.PartCableSmart;
 import appeng.parts.networking.PartDenseCableSmart;
 
+public class ChannelInfoProvider implements IPartProbInfoProvider {
 
-public class ChannelInfoProvider implements IPartProbInfoProvider
-{
+    @Override
+    public void addProbeInfo(IPart part, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world,
+            IBlockState blockState, IProbeHitData data) {
+        if (part instanceof PartDenseCableSmart || part instanceof PartCableSmart) {
+            final int usedChannels;
+            final int maxChannels = (part instanceof PartDenseCableSmart) ? 32 : 8;
 
-	@Override
-	public void addProbeInfo( IPart part, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data )
-	{
-		if( part instanceof PartDenseCableSmart || part instanceof PartCableSmart )
-		{
-			final int usedChannels;
-			final int maxChannels = ( part instanceof PartDenseCableSmart ) ? 32 : 8;
+            if (part.getGridNode().isActive()) {
+                final NBTTagCompound tmp = new NBTTagCompound();
+                part.writeToNBT(tmp);
+                usedChannels = tmp.getByte("usedChannels");
+            } else {
+                usedChannels = 0;
+            }
 
-			if( part.getGridNode().isActive() )
-			{
-				final NBTTagCompound tmp = new NBTTagCompound();
-				part.writeToNBT( tmp );
-				usedChannels = tmp.getByte( "usedChannels" );
-			}
-			else
-			{
-				usedChannels = 0;
-			}
+            final String formattedChannelString = String.format(TheOneProbeText.CHANNELS.getLocal(), usedChannels,
+                    maxChannels);
 
-			final String formattedChannelString = String.format( TheOneProbeText.CHANNELS.getLocal(), usedChannels, maxChannels );
+            probeInfo.text(formattedChannelString);
+        }
 
-			probeInfo.text( formattedChannelString );
-		}
-
-	}
+    }
 
 }

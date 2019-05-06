@@ -18,7 +18,6 @@
 
 package appeng.debug;
 
-
 import javax.annotation.Nullable;
 
 import net.minecraft.block.material.Material;
@@ -31,21 +30,19 @@ import net.minecraft.world.World;
 
 import appeng.block.AEBaseTileBlock;
 
+public class BlockPhantomNode extends AEBaseTileBlock {
 
-public class BlockPhantomNode extends AEBaseTileBlock
-{
+    public BlockPhantomNode() {
+        super(Material.IRON);
+    }
 
-	public BlockPhantomNode()
-	{
-		super( Material.IRON );
-	}
-
-	@Override
-	public boolean onActivated( final World w, final BlockPos pos, final EntityPlayer player, final EnumHand hand, final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY, final float hitZ )
-	{
-		final TilePhantomNode tpn = this.getTileEntity( w, pos );
-		tpn.triggerCrashMode();
-		return true;
-	}
+    @Override
+    public boolean onActivated(final World w, final BlockPos pos, final EntityPlayer player, final EnumHand hand,
+            final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY,
+            final float hitZ) {
+        final TilePhantomNode tpn = this.getTileEntity(w, pos);
+        tpn.triggerCrashMode();
+        return true;
+    }
 
 }

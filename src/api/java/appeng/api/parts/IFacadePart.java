@@ -23,7 +23,6 @@
 
 package appeng.api.parts;
 
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -31,49 +30,47 @@ import net.minecraft.item.ItemStack;
 
 import appeng.api.util.AEPartLocation;
 
-
 /**
  * Used Internally.
  *
  * not intended for implementation.
  */
-public interface IFacadePart
-{
+public interface IFacadePart {
 
-	/**
-	 * used to save the part.
-	 */
-	ItemStack getItemStack();
+    /**
+     * used to save the part.
+     */
+    ItemStack getItemStack();
 
-	/**
-	 * used to collide, and pick the part
-	 *
-	 * @param ch collision helper
-	 * @param e colliding entity
-	 */
-	void getBoxes( IPartCollisionHelper ch, Entity e );
+    /**
+     * used to collide, and pick the part
+     *
+     * @param ch collision helper
+     * @param e  colliding entity
+     */
+    void getBoxes(IPartCollisionHelper ch, Entity e);
 
-	/**
-	 * @return side the facade is in
-	 */
-	AEPartLocation getSide();
+    /**
+     * @return side the facade is in
+     */
+    AEPartLocation getSide();
 
-	Item getItem();
+    Item getItem();
 
-	int getItemDamage();
+    int getItemDamage();
 
-	boolean notAEFacade();
+    boolean notAEFacade();
 
-	boolean isTransparent();
+    boolean isTransparent();
 
-	/**
-	 * The item that this facade masquerades as.
-	 */
-	ItemStack getTextureItem();
+    /**
+     * The item that this facade masquerades as.
+     */
+    ItemStack getTextureItem();
 
-	/**
-	 * @return The block state used for rendering.
-	 */
-	IBlockState getBlockState();
+    /**
+     * @return The block state used for rendering.
+     */
+    IBlockState getBlockState();
 
 }

@@ -18,7 +18,6 @@
 
 package appeng.client.render;
 
-
 import java.util.Arrays;
 
 import com.google.common.collect.ImmutableMap;
@@ -46,50 +45,43 @@ import appeng.bootstrap.components.ItemModelComponent;
 import appeng.bootstrap.components.ItemVariantsComponent;
 import appeng.core.Api;
 
+@Mod(modid = "uvlightmapjsontest", name = "UVLightmapJsonTest", version = "0.0.0")
+public class UVLightmapJsonTest {
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        final ResourceLocation uvlblockR = new ResourceLocation("uvlightmapjsontest", "uvlblock");
+        final Block uvlblock = new Block(Material.IRON) {
+            final AxisAlignedBB box = new AxisAlignedBB(0.25, 0, 7 / 16d, 0.75, 1, 9 / 16d);
 
-@Mod( modid = "uvlightmapjsontest", name = "UVLightmapJsonTest", version = "0.0.0" )
-public class UVLightmapJsonTest
-{
-	@EventHandler
-	public void preInit( FMLPreInitializationEvent event )
-	{
-		final ResourceLocation uvlblockR = new ResourceLocation( "uvlightmapjsontest", "uvlblock" );
-		final Block uvlblock = new Block( Material.IRON )
-		{
-			final AxisAlignedBB box = new AxisAlignedBB( 0.25, 0, 7 / 16d, 0.75, 1, 9 / 16d );
+            @Override
+            public boolean isFullBlock(IBlockState state) {
+                return false;
+            }
 
-			@Override
-			public boolean isFullBlock( IBlockState state )
-			{
-				return false;
-			}
+            @Override
+            public boolean isOpaqueCube(IBlockState state) {
+                return false;
+            }
 
-			@Override
-			public boolean isOpaqueCube( IBlockState state )
-			{
-				return false;
-			}
+            @Override
+            public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+                return this.box;
+            }
 
-			@Override
-			public AxisAlignedBB getBoundingBox( IBlockState state, IBlockAccess source, BlockPos pos )
-			{
-				return this.box;
-			}
+            @Override
+            public BlockRenderLayer getBlockLayer() {
+                return BlockRenderLayer.CUTOUT;
+            }
 
-			@Override
-			public BlockRenderLayer getBlockLayer()
-			{
-				return BlockRenderLayer.CUTOUT;
-			}
+        }.setLightLevel(0.2f).setCreativeTab(CreativeTabs.DECORATIONS).setRegistryName(uvlblockR);
 
-		}.setLightLevel( 0.2f ).setCreativeTab( CreativeTabs.DECORATIONS ).setRegistryName( uvlblockR );
+        final Item uvlblockItem = new ItemBlock(uvlblock).setRegistryName(uvlblockR);
 
-		final Item uvlblockItem = new ItemBlock( uvlblock ).setRegistryName( uvlblockR );
-
-		FeatureFactory fact = Api.INSTANCE.definitions().getRegistry();
-		fact.addBootstrapComponent( (IBlockRegistrationComponent) ( side, registry ) -> registry.register( uvlblock ) );
-		fact.addBootstrapComponent( (IItemRegistrationComponent) ( side, registry ) -> registry.register( uvlblockItem ) );
-		fact.addBootstrapComponent( new ItemVariantsComponent( uvlblockItem, Arrays.asList( uvlblockR ) ) );
-		fact.addBootstrapComponent( new ItemModelComponent( uvlblockItem, ImmutableMap.of( 0, new ModelResourceLocation( uvlblockR, "inventory" ) ) ) );
-	}
+        FeatureFactory fact = Api.INSTANCE.definitions().getRegistry();
+        fact.addBootstrapComponent((IBlockRegistrationComponent) (side, registry) -> registry.register(uvlblock));
+        fact.addBootstrapComponent((IItemRegistrationComponent) (side, registry) -> registry.register(uvlblockItem));
+        fact.addBootstrapComponent(new ItemVariantsComponent(uvlblockItem, Arrays.asList(uvlblockR)));
+        fact.addBootstrapComponent(new ItemModelComponent(uvlblockItem,
+                ImmutableMap.of(0, new ModelResourceLocation(uvlblockR, "inventory"))));
+    }
 }

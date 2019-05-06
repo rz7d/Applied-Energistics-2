@@ -18,7 +18,6 @@
 
 package appeng.block.misc;
 
-
 import javax.annotation.Nullable;
 
 import net.minecraft.block.material.Material;
@@ -37,47 +36,40 @@ import appeng.core.sync.GuiBridge;
 import appeng.tile.misc.TileInscriber;
 import appeng.util.Platform;
 
+public class BlockInscriber extends AEBaseTileBlock {
 
-public class BlockInscriber extends AEBaseTileBlock
-{
+    public BlockInscriber() {
+        super(Material.IRON);
 
-	public BlockInscriber()
-	{
-		super( Material.IRON );
+        this.setLightOpacity(2);
+        this.setFullSize(this.setOpaque(false));
+    }
 
-		this.setLightOpacity( 2 );
-		this.setFullSize( this.setOpaque( false ) );
-	}
+    @Override
+    public boolean onActivated(final World w, final BlockPos pos, final EntityPlayer p, final EnumHand hand,
+            final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY,
+            final float hitZ) {
+        if (p.isSneaking()) {
+            return false;
+        }
 
-	@Override
-	public boolean onActivated( final World w, final BlockPos pos, final EntityPlayer p, final EnumHand hand, final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY, final float hitZ )
-	{
-		if( p.isSneaking() )
-		{
-			return false;
-		}
+        final TileInscriber tg = this.getTileEntity(w, pos);
+        if (tg != null) {
+            if (Platform.isServer()) {
+                Platform.openGUI(p, tg, AEPartLocation.fromFacing(side), GuiBridge.GUI_INSCRIBER);
+            }
+            return true;
+        }
+        return false;
+    }
 
-		final TileInscriber tg = this.getTileEntity( w, pos );
-		if( tg != null )
-		{
-			if( Platform.isServer() )
-			{
-				Platform.openGUI( p, tg, AEPartLocation.fromFacing( side ), GuiBridge.GUI_INSCRIBER );
-			}
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
+    }
 
-	@Override
-	public EnumBlockRenderType getRenderType( IBlockState state )
-	{
-		return EnumBlockRenderType.MODEL;
-	}
-
-	@Override
-	public String getUnlocalizedName( final ItemStack is )
-	{
-		return super.getUnlocalizedName( is );
-	}
+    @Override
+    public String getUnlocalizedName(final ItemStack is) {
+        return super.getUnlocalizedName(is);
+    }
 }

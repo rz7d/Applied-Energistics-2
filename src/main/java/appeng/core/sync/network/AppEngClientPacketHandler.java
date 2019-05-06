@@ -18,7 +18,6 @@
 
 package appeng.core.sync.network;
 
-
 import java.lang.reflect.InvocationTargetException;
 
 import io.netty.buffer.ByteBuf;
@@ -34,49 +33,36 @@ import appeng.core.sync.AppEngPacket;
 import appeng.core.sync.AppEngPacketHandlerBase;
 import appeng.core.sync.PacketCallState;
 
+public class AppEngClientPacketHandler extends AppEngPacketHandlerBase implements IPacketHandler {
 
-public class AppEngClientPacketHandler extends AppEngPacketHandlerBase implements IPacketHandler
-{
+    @Override
+    public void onPacketData(final INetworkInfo manager, final INetHandler handler, final FMLProxyPacket packet,
+            final EntityPlayer player) {
+        final ByteBuf stream = packet.payload();
 
-	@Override
-	public void onPacketData( final INetworkInfo manager, final INetHandler handler, final FMLProxyPacket packet, final EntityPlayer player )
-	{
-		final ByteBuf stream = packet.payload();
+        try {
+            final int packetType = stream.readInt();
+            final AppEngPacket pack = PacketTypes.getPacket(packetType).parsePacket(stream);
 
-		try
-		{
-			final int packetType = stream.readInt();
-			final AppEngPacket pack = PacketTypes.getPacket( packetType ).parsePacket( stream );
+            final PacketCallState callState = new PacketCallState() {
 
-			final PacketCallState callState = new PacketCallState()
-			{
+                @Override
+                public void call(final AppEngPacket appEngPacket) {
+                    appEngPacket.clientPacketData(manager, appEngPacket, Minecraft.getMinecraft().player);
+                }
+            };
 
-				@Override
-				public void call( final AppEngPacket appEngPacket )
-				{
-					appEngPacket.clientPacketData( manager, appEngPacket, Minecraft.getMinecraft().player );
-				}
-			};
-
-			pack.setCallParam( callState );
-			PacketThreadUtil.checkThreadAndEnqueue( pack, handler, Minecraft.getMinecraft() );
-			callState.call( pack );
-		}
-		catch( final InstantiationException e )
-		{
-			AELog.debug( e );
-		}
-		catch( final IllegalAccessException e )
-		{
-			AELog.debug( e );
-		}
-		catch( final IllegalArgumentException e )
-		{
-			AELog.debug( e );
-		}
-		catch( final InvocationTargetException e )
-		{
-			AELog.debug( e );
-		}
-	}
+            pack.setCallParam(callState);
+            PacketThreadUtil.checkThreadAndEnqueue(pack, handler, Minecraft.getMinecraft());
+            callState.call(pack);
+        } catch (final InstantiationException e) {
+            AELog.debug(e);
+        } catch (final IllegalAccessException e) {
+            AELog.debug(e);
+        } catch (final IllegalArgumentException e) {
+            AELog.debug(e);
+        } catch (final InvocationTargetException e) {
+            AELog.debug(e);
+        }
+    }
 }

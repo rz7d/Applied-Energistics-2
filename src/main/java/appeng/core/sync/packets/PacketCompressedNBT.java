@@ -18,7 +18,6 @@
 
 package appeng.core.sync.packets;
 
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -42,76 +41,65 @@ import appeng.client.gui.implementations.GuiInterfaceTerminal;
 import appeng.core.sync.AppEngPacket;
 import appeng.core.sync.network.INetworkInfo;
 
+public class PacketCompressedNBT extends AppEngPacket {
 
-public class PacketCompressedNBT extends AppEngPacket
-{
+    // input.
+    private final NBTTagCompound in;
+    // output...
+    private final ByteBuf data;
+    private final GZIPOutputStream compressFrame;
 
-	// input.
-	private final NBTTagCompound in;
-	// output...
-	private final ByteBuf data;
-	private final GZIPOutputStream compressFrame;
+    // automatic.
+    public PacketCompressedNBT(final ByteBuf stream) throws IOException {
+        this.data = null;
+        this.compressFrame = null;
 
-	// automatic.
-	public PacketCompressedNBT( final ByteBuf stream ) throws IOException
-	{
-		this.data = null;
-		this.compressFrame = null;
+        final GZIPInputStream gzReader = new GZIPInputStream(new InputStream() {
 
-		final GZIPInputStream gzReader = new GZIPInputStream( new InputStream()
-		{
+            @Override
+            public int read() throws IOException {
+                if (stream.readableBytes() <= 0) {
+                    return -1;
+                }
 
-			@Override
-			public int read() throws IOException
-			{
-				if( stream.readableBytes() <= 0 )
-				{
-					return -1;
-				}
+                return stream.readByte() & 0xff;
+            }
+        });
 
-				return stream.readByte() & 0xff;
-			}
-		} );
+        final DataInputStream inStream = new DataInputStream(gzReader);
+        this.in = CompressedStreamTools.read(inStream);
+        inStream.close();
+    }
 
-		final DataInputStream inStream = new DataInputStream( gzReader );
-		this.in = CompressedStreamTools.read( inStream );
-		inStream.close();
-	}
+    // api
+    public PacketCompressedNBT(final NBTTagCompound din) throws IOException {
 
-	// api
-	public PacketCompressedNBT( final NBTTagCompound din ) throws IOException
-	{
+        this.data = Unpooled.buffer(2048);
+        this.data.writeInt(this.getPacketID());
 
-		this.data = Unpooled.buffer( 2048 );
-		this.data.writeInt( this.getPacketID() );
+        this.in = din;
 
-		this.in = din;
+        this.compressFrame = new GZIPOutputStream(new OutputStream() {
 
-		this.compressFrame = new GZIPOutputStream( new OutputStream()
-		{
+            @Override
+            public void write(final int value) throws IOException {
+                PacketCompressedNBT.this.data.writeByte(value);
+            }
+        });
 
-			@Override
-			public void write( final int value ) throws IOException
-			{
-				PacketCompressedNBT.this.data.writeByte( value );
-			}
-		} );
+        CompressedStreamTools.write(din, new DataOutputStream(this.compressFrame));
+        this.compressFrame.close();
 
-		CompressedStreamTools.write( din, new DataOutputStream( this.compressFrame ) );
-		this.compressFrame.close();
+        this.configureWrite(this.data);
+    }
 
-		this.configureWrite( this.data );
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void clientPacketData(final INetworkInfo network, final AppEngPacket packet, final EntityPlayer player) {
+        final GuiScreen gs = Minecraft.getMinecraft().currentScreen;
 
-	@Override
-	@SideOnly( Side.CLIENT )
-	public void clientPacketData( final INetworkInfo network, final AppEngPacket packet, final EntityPlayer player )
-	{
-		final GuiScreen gs = Minecraft.getMinecraft().currentScreen;
-
-		if( gs instanceof GuiInterfaceTerminal )
-		{
-			( (GuiInterfaceTerminal) gs ).postUpdate( this.in );
-		}
-	}
+        if (gs instanceof GuiInterfaceTerminal) {
+            ((GuiInterfaceTerminal) gs).postUpdate(this.in);
+        }
+    }
 }

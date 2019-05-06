@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.waila.tile;
 
-
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
@@ -31,7 +30,6 @@ import appeng.api.implementations.IPowerChannelState;
 import appeng.core.localization.WailaText;
 import appeng.integration.modules.waila.BaseWailaDataProvider;
 
-
 /**
  * Power state provider for WAILA
  *
@@ -39,44 +37,37 @@ import appeng.integration.modules.waila.BaseWailaDataProvider;
  * @version rv2
  * @since rv2
  */
-public final class PowerStateWailaDataProvider extends BaseWailaDataProvider
-{
-	/**
-	 * Adds state to the tooltip
-	 *
-	 * @param itemStack stack of power state
-	 * @param currentToolTip to be added to tooltip
-	 * @param accessor wrapper for various information
-	 * @param config config settings
-	 *
-	 * @return modified tooltip
-	 */
-	@Override
-	public List<String> getWailaBody( final ItemStack itemStack, final List<String> currentToolTip, final IWailaDataAccessor accessor, final IWailaConfigHandler config )
-	{
-		final TileEntity te = accessor.getTileEntity();
+public final class PowerStateWailaDataProvider extends BaseWailaDataProvider {
+    /**
+     * Adds state to the tooltip
+     *
+     * @param itemStack      stack of power state
+     * @param currentToolTip to be added to tooltip
+     * @param accessor       wrapper for various information
+     * @param config         config settings
+     *
+     * @return modified tooltip
+     */
+    @Override
+    public List<String> getWailaBody(final ItemStack itemStack, final List<String> currentToolTip,
+            final IWailaDataAccessor accessor, final IWailaConfigHandler config) {
+        final TileEntity te = accessor.getTileEntity();
 
-		if( te instanceof IPowerChannelState )
-		{
-			final IPowerChannelState state = (IPowerChannelState) te;
+        if (te instanceof IPowerChannelState) {
+            final IPowerChannelState state = (IPowerChannelState) te;
 
-			final boolean isActive = state.isActive();
-			final boolean isPowered = state.isPowered();
+            final boolean isActive = state.isActive();
+            final boolean isPowered = state.isPowered();
 
-			if( isActive && isPowered )
-			{
-				currentToolTip.add( WailaText.DeviceOnline.getLocal() );
-			}
-			else if( isPowered )
-			{
-				currentToolTip.add( WailaText.DeviceMissingChannel.getLocal() );
-			}
-			else
-			{
-				currentToolTip.add( WailaText.DeviceOffline.getLocal() );
-			}
-		}
+            if (isActive && isPowered) {
+                currentToolTip.add(WailaText.DeviceOnline.getLocal());
+            } else if (isPowered) {
+                currentToolTip.add(WailaText.DeviceMissingChannel.getLocal());
+            } else {
+                currentToolTip.add(WailaText.DeviceOffline.getLocal());
+            }
+        }
 
-		return currentToolTip;
-	}
+        return currentToolTip;
+    }
 }

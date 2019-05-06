@@ -18,7 +18,6 @@
 
 package appeng.items;
 
-
 import java.util.List;
 
 import net.minecraft.client.util.ITooltipFlag;
@@ -30,54 +29,46 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+public abstract class AEBaseItem extends Item {
 
-public abstract class AEBaseItem extends Item
-{
+    public AEBaseItem() {
+        this.setNoRepair();
+    }
 
-	public AEBaseItem()
-	{
-		this.setNoRepair();
-	}
+    @Override
+    public String toString() {
+        String regName = this.getRegistryName() != null ? this.getRegistryName().getResourcePath() : "unregistered";
+        return this.getClass().getSimpleName() + "[" + regName + "]";
+    }
 
-	@Override
-	public String toString()
-	{
-		String regName = this.getRegistryName() != null ? this.getRegistryName().getResourcePath() : "unregistered";
-		return this.getClass().getSimpleName() + "[" + regName + "]";
-	}
+    @SideOnly(Side.CLIENT)
+    @Override
+    @SuppressWarnings("unchecked")
+    public final void addInformation(final ItemStack stack, final World world, final List lines,
+            final ITooltipFlag advancedTooltips) {
+        this.addCheckedInformation(stack, world, lines, advancedTooltips);
+    }
 
-	@SideOnly( Side.CLIENT )
-	@Override
-	@SuppressWarnings( "unchecked" )
-	public final void addInformation( final ItemStack stack, final World world, final List lines, final ITooltipFlag advancedTooltips )
-	{
-		this.addCheckedInformation( stack, world, lines, advancedTooltips );
-	}
+    @Override
+    public final void getSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
+        if (this.isInCreativeTab(creativeTab)) {
+            this.getCheckedSubItems(creativeTab, itemStacks);
+        }
+    }
 
-	@Override
-	public final void getSubItems( final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks )
-	{
-		if( this.isInCreativeTab( creativeTab ) )
-		{
-			this.getCheckedSubItems( creativeTab, itemStacks );
-		}
-	}
+    @Override
+    public boolean isBookEnchantable(final ItemStack itemstack1, final ItemStack itemstack2) {
+        return false;
+    }
 
-	@Override
-	public boolean isBookEnchantable( final ItemStack itemstack1, final ItemStack itemstack2 )
-	{
-		return false;
-	}
+    @SideOnly(Side.CLIENT)
+    protected void addCheckedInformation(final ItemStack stack, final World world, final List<String> lines,
+            final ITooltipFlag advancedTooltips) {
+        super.addInformation(stack, world, lines, advancedTooltips);
+    }
 
-	@SideOnly( Side.CLIENT )
-	protected void addCheckedInformation( final ItemStack stack, final World world, final List<String> lines, final ITooltipFlag advancedTooltips )
-	{
-		super.addInformation( stack, world, lines, advancedTooltips );
-	}
-
-	protected void getCheckedSubItems( final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks )
-	{
-		super.getSubItems( creativeTab, itemStacks );
-	}
+    protected void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
+        super.getSubItems(creativeTab, itemStacks);
+    }
 
 }

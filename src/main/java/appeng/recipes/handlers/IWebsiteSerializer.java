@@ -18,18 +18,15 @@
 
 package appeng.recipes.handlers;
 
-
 import net.minecraft.item.ItemStack;
 
 import appeng.api.exceptions.MissingIngredientException;
 import appeng.api.exceptions.RegistrationException;
 import appeng.recipes.RecipeHandler;
 
+public interface IWebsiteSerializer {
 
-public interface IWebsiteSerializer
-{
+    String getPattern(RecipeHandler han);
 
-	String getPattern( RecipeHandler han );
-
-	boolean canCraft( ItemStack output ) throws RegistrationException, MissingIngredientException;
+    boolean canCraft(ItemStack output) throws RegistrationException, MissingIngredientException;
 }

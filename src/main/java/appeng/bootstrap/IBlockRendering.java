@@ -18,7 +18,6 @@
 
 package appeng.bootstrap;
 
-
 import java.util.function.BiFunction;
 
 import net.minecraft.client.renderer.block.model.IBakedModel;
@@ -30,29 +29,28 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-
 /**
- * Allows for client-side rendering to be customized in the context of block/item registration.
+ * Allows for client-side rendering to be customized in the context of
+ * block/item registration.
  */
-public interface IBlockRendering
-{
+public interface IBlockRendering {
 
-	@SideOnly( Side.CLIENT )
-	IBlockRendering modelCustomizer( BiFunction<ModelResourceLocation, IBakedModel, IBakedModel> customizer );
+    @SideOnly(Side.CLIENT)
+    IBlockRendering modelCustomizer(BiFunction<ModelResourceLocation, IBakedModel, IBakedModel> customizer);
 
-	@SideOnly( Side.CLIENT )
-	IBlockRendering blockColor( IBlockColor blockColor );
+    @SideOnly(Side.CLIENT)
+    IBlockRendering blockColor(IBlockColor blockColor);
 
-	@SideOnly( Side.CLIENT )
-	IBlockRendering stateMapper( IStateMapper mapper );
+    @SideOnly(Side.CLIENT)
+    IBlockRendering stateMapper(IStateMapper mapper);
 
-	@SideOnly( Side.CLIENT )
-	IBlockRendering tesr( TileEntitySpecialRenderer<?> tesr );
+    @SideOnly(Side.CLIENT)
+    IBlockRendering tesr(TileEntitySpecialRenderer<?> tesr);
 
-	/**
-	 * Registers a built-in model under the given resource path.
-	 */
-	@SideOnly( Side.CLIENT )
-	IBlockRendering builtInModel( String name, IModel model );
+    /**
+     * Registers a built-in model under the given resource path.
+     */
+    @SideOnly(Side.CLIENT)
+    IBlockRendering builtInModel(String name, IModel model);
 
 }

@@ -18,11 +18,9 @@
 
 package appeng.helpers;
 
+public interface ICustomNameObject {
 
-public interface ICustomNameObject
-{
+    String getCustomInventoryName();
 
-	String getCustomInventoryName();
-
-	boolean hasCustomInventoryName();
+    boolean hasCustomInventoryName();
 }

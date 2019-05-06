@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.crafttweaker;
 
-
 import crafttweaker.api.item.IIngredient;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -26,18 +25,13 @@ import stanhebben.zenscript.annotations.ZenMethod;
 import appeng.api.AEApi;
 import appeng.api.features.IMatterCannonAmmoRegistry;
 
+@ZenClass("mods.appliedenergistics2.Cannon")
+public class CannonRegistry {
+    private CannonRegistry() {}
 
-@ZenClass( "mods.appliedenergistics2.Cannon" )
-public class CannonRegistry
-{
-	private CannonRegistry()
-	{
-	}
-
-	@ZenMethod
-	public static void registerAmmo( IIngredient itemStack, double weight )
-	{
-		IMatterCannonAmmoRegistry registry = AEApi.instance().registries().matterCannon();
-		CTModule.toStacks( itemStack ).ifPresent( c -> c.forEach( i -> registry.registerAmmo( i, weight ) ) );
-	}
+    @ZenMethod
+    public static void registerAmmo(IIngredient itemStack, double weight) {
+        IMatterCannonAmmoRegistry registry = AEApi.instance().registries().matterCannon();
+        CTModule.toStacks(itemStack).ifPresent(c -> c.forEach(i -> registry.registerAmmo(i, weight)));
+    }
 }

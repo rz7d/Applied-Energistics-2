@@ -18,7 +18,6 @@
 
 package appeng.client.render.model;
 
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Function;
@@ -33,38 +32,34 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 
-
 /**
  * Model class for the connected texture glass model.
  */
-public class GlassModel implements IModel
-{
+public class GlassModel implements IModel {
 
-	@Override
-	public Collection<ResourceLocation> getDependencies()
-	{
-		return Collections.emptySet();
-	}
+    @Override
+    public Collection<ResourceLocation> getDependencies() {
+        return Collections.emptySet();
+    }
 
-	@Override
-	public Collection<ResourceLocation> getTextures()
-	{
-		return ImmutableSet.<ResourceLocation>builder()
-				.add( GlassBakedModel.TEXTURE_A, GlassBakedModel.TEXTURE_B, GlassBakedModel.TEXTURE_C, GlassBakedModel.TEXTURE_D )
-				.add( GlassBakedModel.TEXTURES_FRAME )
-				.build();
-	}
+    @Override
+    public Collection<ResourceLocation> getTextures() {
+        return ImmutableSet.<ResourceLocation>builder()
+                .add(GlassBakedModel.TEXTURE_A, GlassBakedModel.TEXTURE_B, GlassBakedModel.TEXTURE_C,
+                        GlassBakedModel.TEXTURE_D)
+                .add(GlassBakedModel.TEXTURES_FRAME)
+                .build();
+    }
 
-	@Override
-	public IBakedModel bake( IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter )
-	{
-		return new GlassBakedModel( format, bakedTextureGetter );
-	}
+    @Override
+    public IBakedModel bake(IModelState state, VertexFormat format,
+            Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+        return new GlassBakedModel(format, bakedTextureGetter);
+    }
 
-	@Override
-	public IModelState getDefaultState()
-	{
-		return TRSRTransformation.identity();
-	}
+    @Override
+    public IModelState getDefaultState() {
+        return TRSRTransformation.identity();
+    }
 
 }

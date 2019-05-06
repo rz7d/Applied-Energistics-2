@@ -18,7 +18,6 @@
 
 package appeng.core.sync.packets;
 
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -33,44 +32,37 @@ import appeng.core.sync.GuiBridge;
 import appeng.core.sync.network.INetworkInfo;
 import appeng.util.Platform;
 
+public class PacketSwitchGuis extends AppEngPacket {
 
-public class PacketSwitchGuis extends AppEngPacket
-{
+    private final GuiBridge newGui;
 
-	private final GuiBridge newGui;
+    // automatic.
+    public PacketSwitchGuis(final ByteBuf stream) {
+        this.newGui = GuiBridge.values()[stream.readInt()];
+    }
 
-	// automatic.
-	public PacketSwitchGuis( final ByteBuf stream )
-	{
-		this.newGui = GuiBridge.values()[stream.readInt()];
-	}
+    // api
+    public PacketSwitchGuis(final GuiBridge newGui) {
+        this.newGui = newGui;
 
-	// api
-	public PacketSwitchGuis( final GuiBridge newGui )
-	{
-		this.newGui = newGui;
+        final ByteBuf data = Unpooled.buffer();
 
-		final ByteBuf data = Unpooled.buffer();
+        data.writeInt(this.getPacketID());
+        data.writeInt(newGui.ordinal());
 
-		data.writeInt( this.getPacketID() );
-		data.writeInt( newGui.ordinal() );
+        this.configureWrite(data);
+    }
 
-		this.configureWrite( data );
-	}
-
-	@Override
-	public void serverPacketData( final INetworkInfo manager, final AppEngPacket packet, final EntityPlayer player )
-	{
-		final Container c = player.openContainer;
-		if( c instanceof AEBaseContainer )
-		{
-			final AEBaseContainer bc = (AEBaseContainer) c;
-			final ContainerOpenContext context = bc.getOpenContext();
-			if( context != null )
-			{
-				final TileEntity te = context.getTile();
-				Platform.openGUI( player, te, context.getSide(), this.newGui );
-			}
-		}
-	}
+    @Override
+    public void serverPacketData(final INetworkInfo manager, final AppEngPacket packet, final EntityPlayer player) {
+        final Container c = player.openContainer;
+        if (c instanceof AEBaseContainer) {
+            final AEBaseContainer bc = (AEBaseContainer) c;
+            final ContainerOpenContext context = bc.getOpenContext();
+            if (context != null) {
+                final TileEntity te = context.getTile();
+                Platform.openGUI(player, te, context.getSide(), this.newGui);
+            }
+        }
+    }
 }

@@ -18,7 +18,6 @@
 
 package appeng.fluids.items;
 
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,7 +28,6 @@ import net.minecraftforge.fluids.FluidStack;
 
 import appeng.items.AEBaseItem;
 
-
 /**
  * Dummy item to display the fluid Icon
  *
@@ -37,47 +35,37 @@ import appeng.items.AEBaseItem;
  * @version rv6 - 2018-01-22
  * @since rv6 2018-01-22
  */
-public class FluidDummyItem extends AEBaseItem
-{
-	@Override
-	public String getItemStackDisplayName( ItemStack stack )
-	{
+public class FluidDummyItem extends AEBaseItem {
+    @Override
+    public String getItemStackDisplayName(ItemStack stack) {
 
-		FluidStack fluidStack = this.getFluidStack( stack );
-		if( fluidStack == null )
-		{
-			fluidStack = new FluidStack( FluidRegistry.WATER, Fluid.BUCKET_VOLUME );
-		}
-		return fluidStack.getLocalizedName();
-	}
+        FluidStack fluidStack = this.getFluidStack(stack);
+        if (fluidStack == null) {
+            fluidStack = new FluidStack(FluidRegistry.WATER, Fluid.BUCKET_VOLUME);
+        }
+        return fluidStack.getLocalizedName();
+    }
 
-	public FluidStack getFluidStack( ItemStack is )
-	{
-		if( is.hasTagCompound() )
-		{
-			NBTTagCompound tag = is.getTagCompound();
-			return FluidStack.loadFluidStackFromNBT( tag );
-		}
-		return null;
-	}
+    public FluidStack getFluidStack(ItemStack is) {
+        if (is.hasTagCompound()) {
+            NBTTagCompound tag = is.getTagCompound();
+            return FluidStack.loadFluidStackFromNBT(tag);
+        }
+        return null;
+    }
 
-	public void setFluidStack( ItemStack is, FluidStack fs )
-	{
-		if( fs == null )
-		{
-			is.setTagCompound( null );
-		}
-		else
-		{
-			NBTTagCompound tag = new NBTTagCompound();
-			fs.writeToNBT( tag );
-			is.setTagCompound( tag );
-		}
-	}
+    public void setFluidStack(ItemStack is, FluidStack fs) {
+        if (fs == null) {
+            is.setTagCompound(null);
+        } else {
+            NBTTagCompound tag = new NBTTagCompound();
+            fs.writeToNBT(tag);
+            is.setTagCompound(tag);
+        }
+    }
 
-	@Override
-	protected void getCheckedSubItems( final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks )
-	{
-		// Don't show this item in CreativeTabs
-	}
+    @Override
+    protected void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
+        // Don't show this item in CreativeTabs
+    }
 }

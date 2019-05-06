@@ -18,7 +18,6 @@
 
 package appeng.block.crafting;
 
-
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
@@ -39,73 +38,64 @@ import appeng.core.sync.GuiBridge;
 import appeng.tile.crafting.TileMolecularAssembler;
 import appeng.util.Platform;
 
+public class BlockMolecularAssembler extends AEBaseTileBlock {
 
-public class BlockMolecularAssembler extends AEBaseTileBlock
-{
+    public static final PropertyBool POWERED = PropertyBool.create("powered");
 
-	public static final PropertyBool POWERED = PropertyBool.create( "powered" );
+    public BlockMolecularAssembler() {
+        super(Material.IRON);
 
-	public BlockMolecularAssembler()
-	{
-		super( Material.IRON );
+        this.setOpaque(false);
+        this.lightOpacity = 1;
+    }
 
-		this.setOpaque( false );
-		this.lightOpacity = 1;
-	}
+    @Override
+    protected IProperty[] getAEStates() {
+        return new IProperty[] { POWERED };
+    }
 
-	@Override
-	protected IProperty[] getAEStates()
-	{
-		return new IProperty[] { POWERED };
-	}
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        boolean powered = false;
+        TileMolecularAssembler te = this.getTileEntity(worldIn, pos);
+        if (te != null) {
+            powered = te.isPowered();
+        }
 
-	@Override
-	public IBlockState getActualState( IBlockState state, IBlockAccess worldIn, BlockPos pos )
-	{
-		boolean powered = false;
-		TileMolecularAssembler te = this.getTileEntity( worldIn, pos );
-		if( te != null )
-		{
-			powered = te.isPowered();
-		}
+        return super.getActualState(state, worldIn, pos).withProperty(POWERED, powered);
+    }
 
-		return super.getActualState( state, worldIn, pos ).withProperty( POWERED, powered );
-	}
+    /**
+     * NOTE: This is only used to determine how to render an item being held in
+     * hand. For determining block rendering, the method below is used
+     * (canRenderInLayer).
+     */
+    @SideOnly(Side.CLIENT)
+    @Override
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
+    }
 
-	/**
-	 * NOTE: This is only used to determine how to render an item being held in hand.
-	 * For determining block rendering, the method below is used (canRenderInLayer).
-	 */
-	@SideOnly( Side.CLIENT )
-	@Override
-	public BlockRenderLayer getBlockLayer()
-	{
-		return BlockRenderLayer.CUTOUT;
-	}
+    @SideOnly(Side.CLIENT)
+    @Override
+    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+        return layer == BlockRenderLayer.CUTOUT || layer == BlockRenderLayer.TRANSLUCENT;
+    }
 
-	@SideOnly( Side.CLIENT )
-	@Override
-	public boolean canRenderInLayer( IBlockState state, BlockRenderLayer layer )
-	{
-		return layer == BlockRenderLayer.CUTOUT || layer == BlockRenderLayer.TRANSLUCENT;
-	}
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 
-	@Override
-	public boolean isFullCube( IBlockState state )
-	{
-		return false;
-	}
+    @Override
+    public boolean onBlockActivated(final World w, final BlockPos pos, final IBlockState state, final EntityPlayer p,
+            final EnumHand hand, final EnumFacing side, final float hitX, final float hitY, final float hitZ) {
+        final TileMolecularAssembler tg = this.getTileEntity(w, pos);
+        if (tg != null && !p.isSneaking()) {
+            Platform.openGUI(p, tg, AEPartLocation.fromFacing(side), GuiBridge.GUI_MAC);
+            return true;
+        }
 
-	@Override
-	public boolean onBlockActivated( final World w, final BlockPos pos, final IBlockState state, final EntityPlayer p, final EnumHand hand, final EnumFacing side, final float hitX, final float hitY, final float hitZ )
-	{
-		final TileMolecularAssembler tg = this.getTileEntity( w, pos );
-		if( tg != null && !p.isSneaking() )
-		{
-			Platform.openGUI( p, tg, AEPartLocation.fromFacing( side ), GuiBridge.GUI_MAC );
-			return true;
-		}
-
-		return super.onBlockActivated( w, pos, state, p, hand, side, hitX, hitY, hitZ );
-	}
+        return super.onBlockActivated(w, pos, state, p, hand, side, hitX, hitY, hitZ);
+    }
 }

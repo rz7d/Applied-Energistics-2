@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.jei;
 
-
 import java.util.Collections;
 import java.util.List;
 
@@ -32,44 +31,36 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 import appeng.api.AEApi;
 import appeng.api.features.IInscriberRegistry;
 
-
 /**
  * Exposes the inscriber registry recipes to JEI.
  */
-class InscriberRegistryPlugin implements IRecipeRegistryPlugin
-{
+class InscriberRegistryPlugin implements IRecipeRegistryPlugin {
 
-	private final IInscriberRegistry inscriber = AEApi.instance().registries().inscriber();
+    private final IInscriberRegistry inscriber = AEApi.instance().registries().inscriber();
 
-	@Override
-	public <V> List<String> getRecipeCategoryUids( IFocus<V> focus )
-	{
-		if( !( focus.getValue() instanceof ItemStack ) )
-		{
-			return Collections.emptyList();
-		}
+    @Override
+    public <V> List<String> getRecipeCategoryUids(IFocus<V> focus) {
+        if (!(focus.getValue() instanceof ItemStack)) {
+            return Collections.emptyList();
+        }
 
-		if( focus.getMode() == IFocus.Mode.INPUT )
-		{
-			ItemStack input = (ItemStack) focus.getValue();
-			for( ItemStack validInput : this.inscriber.getInputs() )
-			{
+        if (focus.getMode() == IFocus.Mode.INPUT) {
+            ItemStack input = (ItemStack) focus.getValue();
+            for (ItemStack validInput : this.inscriber.getInputs()) {
 
-			}
-		}
+            }
+        }
 
-		return Collections.emptyList();
-	}
+        return Collections.emptyList();
+    }
 
-	@Override
-	public <T extends IRecipeWrapper, V> List<T> getRecipeWrappers( IRecipeCategory<T> recipeCategory, IFocus<V> focus )
-	{
-		return null;
-	}
+    @Override
+    public <T extends IRecipeWrapper, V> List<T> getRecipeWrappers(IRecipeCategory<T> recipeCategory, IFocus<V> focus) {
+        return null;
+    }
 
-	@Override
-	public <T extends IRecipeWrapper> List<T> getRecipeWrappers( IRecipeCategory<T> recipeCategory )
-	{
-		return null;
-	}
+    @Override
+    public <T extends IRecipeWrapper> List<T> getRecipeWrappers(IRecipeCategory<T> recipeCategory) {
+        return null;
+    }
 }

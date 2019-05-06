@@ -18,7 +18,6 @@
 
 package appeng.util.item;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -30,43 +29,34 @@ import net.minecraft.item.ItemStack;
 
 import appeng.api.storage.data.IAEItemStack;
 
+public class OreReference {
 
-public class OreReference
-{
+    private final List<String> otherOptions = new ArrayList<>();
+    private final Set<Integer> ores = new HashSet<>();
+    private List<IAEItemStack> aeOtherOptions = null;
 
-	private final List<String> otherOptions = new ArrayList<>();
-	private final Set<Integer> ores = new HashSet<>();
-	private List<IAEItemStack> aeOtherOptions = null;
+    Collection<String> getEquivalents() {
+        return this.otherOptions;
+    }
 
-	Collection<String> getEquivalents()
-	{
-		return this.otherOptions;
-	}
+    List<IAEItemStack> getAEEquivalents() {
+        if (this.aeOtherOptions == null) {
+            this.aeOtherOptions = new ArrayList<>(this.otherOptions.size());
 
-	List<IAEItemStack> getAEEquivalents()
-	{
-		if( this.aeOtherOptions == null )
-		{
-			this.aeOtherOptions = new ArrayList<>( this.otherOptions.size() );
+            // SUMMON AE STACKS!
+            for (final String oreName : this.otherOptions) {
+                for (final ItemStack is : OreHelper.INSTANCE.getCachedOres(oreName)) {
+                    if (is.getItem() != Items.AIR) {
+                        this.aeOtherOptions.add(AEItemStack.fromItemStack(is));
+                    }
+                }
+            }
+        }
 
-			// SUMMON AE STACKS!
-			for( final String oreName : this.otherOptions )
-			{
-				for( final ItemStack is : OreHelper.INSTANCE.getCachedOres( oreName ) )
-				{
-					if( is.getItem() != Items.AIR )
-					{
-						this.aeOtherOptions.add( AEItemStack.fromItemStack( is ) );
-					}
-				}
-			}
-		}
+        return this.aeOtherOptions;
+    }
 
-		return this.aeOtherOptions;
-	}
-
-	Collection<Integer> getOres()
-	{
-		return this.ores;
-	}
+    Collection<Integer> getOres() {
+        return this.ores;
+    }
 }

@@ -18,50 +18,44 @@
 
 package appeng.integration.modules.theoneprobe;
 
-
 import java.util.Locale;
 
 import net.minecraft.util.text.translation.I18n;
 
+public enum TheOneProbeText {
+    CRAFTING,
 
-public enum TheOneProbeText
-{
-	CRAFTING,
+    DEVICE_ONLINE,
+    DEVICE_OFFLINE,
+    DEVICE_MISSING_CHANNEL,
 
-	DEVICE_ONLINE,
-	DEVICE_OFFLINE,
-	DEVICE_MISSING_CHANNEL,
+    P2P_UNLINKED,
+    P2P_INPUT_ONE_OUTPUT,
+    P2P_INPUT_MANY_OUTPUTS,
+    P2P_OUTPUT,
+    P2P_FREQUENCY,
 
-	P2P_UNLINKED,
-	P2P_INPUT_ONE_OUTPUT,
-	P2P_INPUT_MANY_OUTPUTS,
-	P2P_OUTPUT,
-	P2P_FREQUENCY,
+    LOCKED,
+    UNLOCKED,
+    SHOWING,
 
-	LOCKED,
-	UNLOCKED,
-	SHOWING,
+    CONTAINS,
+    CHANNELS,
 
-	CONTAINS,
-	CHANNELS,
+    STORED_ENERGY;
 
-	STORED_ENERGY;
+    private final String root;
 
-	private final String root;
+    TheOneProbeText() {
+        this.root = "theoneprobe.appliedenergistics2";
+    }
 
-	TheOneProbeText()
-	{
-		this.root = "theoneprobe.appliedenergistics2";
-	}
+    public String getLocal() {
+        return I18n.translateToLocal(this.getUnlocalized());
+    }
 
-	public String getLocal()
-	{
-		return I18n.translateToLocal( this.getUnlocalized() );
-	}
-
-	public String getUnlocalized()
-	{
-		return this.root + '.' + this.name().toLowerCase( Locale.ENGLISH );
-	}
+    public String getUnlocalized() {
+        return this.root + '.' + this.name().toLowerCase(Locale.ENGLISH);
+    }
 
 }

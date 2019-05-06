@@ -18,7 +18,6 @@
 
 package appeng.recipes.factories.conditions;
 
-
 import java.util.function.BooleanSupplier;
 
 import com.google.gson.JsonObject;
@@ -30,29 +29,23 @@ import net.minecraftforge.common.crafting.JsonContext;
 import appeng.core.Api;
 import appeng.core.AppEng;
 
+public class MaterialExists implements IConditionFactory {
+    private static final String JSON_MATERIAL_KEY = "material";
 
-public class MaterialExists implements IConditionFactory
-{
-	private static final String JSON_MATERIAL_KEY = "material";
+    @Override
+    public BooleanSupplier parse(JsonContext jsonContext, JsonObject jsonObject) {
+        final boolean result;
 
-	@Override
-	public BooleanSupplier parse( JsonContext jsonContext, JsonObject jsonObject )
-	{
-		final boolean result;
+        if (JsonUtils.isString(jsonObject, JSON_MATERIAL_KEY)) {
+            final String material = JsonUtils.getString(jsonObject, JSON_MATERIAL_KEY);
+            final Object item = Api.INSTANCE.registries().recipes().resolveItem(AppEng.MOD_ID, material);
 
-		if( JsonUtils.isString( jsonObject, JSON_MATERIAL_KEY ) )
-		{
-			final String material = JsonUtils.getString( jsonObject, JSON_MATERIAL_KEY );
-			final Object item = Api.INSTANCE.registries().recipes().resolveItem( AppEng.MOD_ID, material );
+            result = item != null;
+        } else {
+            result = false;
+        }
 
-			result = item != null;
-		}
-		else
-		{
-			result = false;
-		}
+        return () -> result;
 
-		return () -> result;
-
-	}
+    }
 }

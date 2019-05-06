@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.jei;
 
-
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 
@@ -33,70 +32,60 @@ import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 
 import appeng.core.AppEng;
 
+class GrinderRecipeCategory implements IRecipeCategory<GrinderRecipeWrapper>, IRecipeCategoryRegistration {
 
-class GrinderRecipeCategory implements IRecipeCategory<GrinderRecipeWrapper>, IRecipeCategoryRegistration
-{
+    public static final String UID = "appliedenergistics2.grinder";
 
-	public static final String UID = "appliedenergistics2.grinder";
+    private final String localizedName;
 
-	private final String localizedName;
+    private final IDrawable background;
 
-	private final IDrawable background;
+    public GrinderRecipeCategory(IGuiHelper guiHelper) {
+        this.localizedName = I18n.format("tile.appliedenergistics2.grindstone.name");
 
-	public GrinderRecipeCategory( IGuiHelper guiHelper )
-	{
-		this.localizedName = I18n.format( "tile.appliedenergistics2.grindstone.name" );
+        ResourceLocation location = new ResourceLocation(AppEng.MOD_ID, "textures/guis/grinder.png");
+        this.background = guiHelper.createDrawable(location, 11, 16, 154, 64);
+    }
 
-		ResourceLocation location = new ResourceLocation( AppEng.MOD_ID, "textures/guis/grinder.png" );
-		this.background = guiHelper.createDrawable( location, 11, 16, 154, 64 );
-	}
+    @Override
+    public String getModName() {
+        return AppEng.MOD_NAME;
+    }
 
-	@Override
-	public String getModName()
-	{
-		return AppEng.MOD_NAME;
-	}
+    @Override
+    public String getUid() {
+        return GrinderRecipeCategory.UID;
+    }
 
-	@Override
-	public String getUid()
-	{
-		return GrinderRecipeCategory.UID;
-	}
+    @Override
+    public String getTitle() {
+        return this.localizedName;
+    }
 
-	@Override
-	public String getTitle()
-	{
-		return this.localizedName;
-	}
+    @Override
+    public IDrawable getBackground() {
+        return this.background;
+    }
 
-	@Override
-	public IDrawable getBackground()
-	{
-		return this.background;
-	}
+    @Override
+    public void setRecipe(IRecipeLayout recipeLayout, GrinderRecipeWrapper recipeWrapper, IIngredients ingredients) {
+        IGuiItemStackGroup itemStacks = recipeLayout.getItemStacks();
 
-	@Override
-	public void setRecipe( IRecipeLayout recipeLayout, GrinderRecipeWrapper recipeWrapper, IIngredients ingredients )
-	{
-		IGuiItemStackGroup itemStacks = recipeLayout.getItemStacks();
+        itemStacks.init(0, true, 0, 0);
+        itemStacks.init(1, false, 100, 46);
+        itemStacks.init(2, false, 118, 46);
+        itemStacks.init(3, false, 136, 46);
 
-		itemStacks.init( 0, true, 0, 0 );
-		itemStacks.init( 1, false, 100, 46 );
-		itemStacks.init( 2, false, 118, 46 );
-		itemStacks.init( 3, false, 136, 46 );
+        itemStacks.set(ingredients);
+    }
 
-		itemStacks.set( ingredients );
-	}
+    @Override
+    public void addRecipeCategories(IRecipeCategory... recipeCategories) {
 
-	@Override
-	public void addRecipeCategories( IRecipeCategory... recipeCategories )
-	{
+    }
 
-	}
-
-	@Override
-	public IJeiHelpers getJeiHelpers()
-	{
-		return null;
-	}
+    @Override
+    public IJeiHelpers getJeiHelpers() {
+        return null;
+    }
 }

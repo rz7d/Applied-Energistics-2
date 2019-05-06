@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.jei;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,26 +29,22 @@ import mezz.jei.api.recipe.IRecipeWrapper;
 
 import appeng.api.features.IInscriberRecipe;
 
+class InscriberRecipeWrapper implements IRecipeWrapper {
 
-class InscriberRecipeWrapper implements IRecipeWrapper
-{
+    private final IInscriberRecipe recipe;
 
-	private final IInscriberRecipe recipe;
+    public InscriberRecipeWrapper(IInscriberRecipe recipe) {
+        this.recipe = recipe;
+    }
 
-	public InscriberRecipeWrapper( IInscriberRecipe recipe )
-	{
-		this.recipe = recipe;
-	}
+    @Override
+    public void getIngredients(IIngredients ingredients) {
+        List<List<ItemStack>> inputSlots = new ArrayList<>(3);
+        inputSlots.add(Collections.singletonList(this.recipe.getTopOptional().orElse(ItemStack.EMPTY)));
+        inputSlots.add(this.recipe.getInputs());
+        inputSlots.add(Collections.singletonList(this.recipe.getBottomOptional().orElse(ItemStack.EMPTY)));
+        ingredients.setInputLists(ItemStack.class, inputSlots);
 
-	@Override
-	public void getIngredients( IIngredients ingredients )
-	{
-		List<List<ItemStack>> inputSlots = new ArrayList<>( 3 );
-		inputSlots.add( Collections.singletonList( this.recipe.getTopOptional().orElse( ItemStack.EMPTY ) ) );
-		inputSlots.add( this.recipe.getInputs() );
-		inputSlots.add( Collections.singletonList( this.recipe.getBottomOptional().orElse( ItemStack.EMPTY ) ) );
-		ingredients.setInputLists( ItemStack.class, inputSlots );
-
-		ingredients.setOutput( ItemStack.class, this.recipe.getOutput() );
-	}
+        ingredients.setOutput(ItemStack.class, this.recipe.getOutput());
+    }
 }

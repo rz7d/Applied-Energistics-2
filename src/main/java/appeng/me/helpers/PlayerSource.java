@@ -18,7 +18,6 @@
 
 package appeng.me.helpers;
 
-
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
@@ -28,35 +27,29 @@ import net.minecraft.entity.player.EntityPlayer;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.IActionSource;
 
+public class PlayerSource implements IActionSource {
 
-public class PlayerSource implements IActionSource
-{
+    private final EntityPlayer player;
+    private final IActionHost via;
 
-	private final EntityPlayer player;
-	private final IActionHost via;
+    public PlayerSource(final EntityPlayer p, final IActionHost v) {
+        Preconditions.checkNotNull(p);
+        this.player = p;
+        this.via = v;
+    }
 
-	public PlayerSource( final EntityPlayer p, final IActionHost v )
-	{
-		Preconditions.checkNotNull( p );
-		this.player = p;
-		this.via = v;
-	}
+    @Override
+    public Optional<EntityPlayer> player() {
+        return Optional.of(this.player);
+    }
 
-	@Override
-	public Optional<EntityPlayer> player()
-	{
-		return Optional.of( this.player );
-	}
+    @Override
+    public Optional<IActionHost> machine() {
+        return Optional.ofNullable(this.via);
+    }
 
-	@Override
-	public Optional<IActionHost> machine()
-	{
-		return Optional.ofNullable( this.via );
-	}
-
-	@Override
-	public <T> Optional<T> context( Class<T> key )
-	{
-		return Optional.empty();
-	}
+    @Override
+    public <T> Optional<T> context(Class<T> key) {
+        return Optional.empty();
+    }
 }

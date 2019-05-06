@@ -18,7 +18,6 @@
 
 package appeng.block.grindstone;
 
-
 import javax.annotation.Nullable;
 
 import net.minecraft.block.material.Material;
@@ -35,26 +34,23 @@ import appeng.core.sync.GuiBridge;
 import appeng.tile.grindstone.TileGrinder;
 import appeng.util.Platform;
 
+public class BlockGrinder extends AEBaseTileBlock {
 
-public class BlockGrinder extends AEBaseTileBlock
-{
+    public BlockGrinder() {
+        super(Material.ROCK);
 
-	public BlockGrinder()
-	{
-		super( Material.ROCK );
+        this.setHardness(3.2F);
+    }
 
-		this.setHardness( 3.2F );
-	}
-
-	@Override
-	public boolean onActivated( final World w, final BlockPos pos, final EntityPlayer p, final EnumHand hand, final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY, final float hitZ )
-	{
-		final TileGrinder tg = this.getTileEntity( w, pos );
-		if( tg != null && !p.isSneaking() )
-		{
-			Platform.openGUI( p, tg, AEPartLocation.fromFacing( side ), GuiBridge.GUI_GRINDER );
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public boolean onActivated(final World w, final BlockPos pos, final EntityPlayer p, final EnumHand hand,
+            final @Nullable ItemStack heldItem, final EnumFacing side, final float hitX, final float hitY,
+            final float hitZ) {
+        final TileGrinder tg = this.getTileEntity(w, pos);
+        if (tg != null && !p.isSneaking()) {
+            Platform.openGUI(p, tg, AEPartLocation.fromFacing(side), GuiBridge.GUI_GRINDER);
+            return true;
+        }
+        return false;
+    }
 }

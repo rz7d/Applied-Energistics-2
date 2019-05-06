@@ -18,7 +18,6 @@
 
 package appeng.fluids.client.gui.widgets;
 
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,99 +31,88 @@ import appeng.api.util.AEColor;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.fluids.util.IAEFluidTank;
 
+@SideOnly(Side.CLIENT)
+public class GuiFluidTank extends GuiButton implements ITooltip {
+    private final IAEFluidTank tank;
+    private final int slot;
 
-@SideOnly( Side.CLIENT )
-public class GuiFluidTank extends GuiButton implements ITooltip
-{
-	private final IAEFluidTank tank;
-	private final int slot;
+    public GuiFluidTank(IAEFluidTank tank, int slot, int id, int x, int y, int w, int h) {
+        super(id, x, y, w, h, "");
+        this.tank = tank;
+        this.slot = slot;
+    }
 
-	public GuiFluidTank( IAEFluidTank tank, int slot, int id, int x, int y, int w, int h )
-	{
-		super( id, x, y, w, h, "" );
-		this.tank = tank;
-		this.slot = slot;
-	}
+    @Override
+    public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, final float partialTicks) {
+        if (this.visible) {
+            GlStateManager.disableBlend();
+            GlStateManager.disableLighting();
 
-	@Override
-	public void drawButton( final Minecraft mc, final int mouseX, final int mouseY, final float partialTicks )
-	{
-		if( this.visible )
-		{
-			GlStateManager.disableBlend();
-			GlStateManager.disableLighting();
+            drawRect(this.x, this.y, this.x + this.width, this.y + this.height, AEColor.GRAY.blackVariant | 0xFF000000);
 
-			drawRect( this.x, this.y, this.x + this.width, this.y + this.height, AEColor.GRAY.blackVariant | 0xFF000000 );
+            final IAEFluidStack fluid = this.tank.getFluidInSlot(this.slot);
+            if (fluid != null && fluid.getStackSize() > 0) {
+                mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-			final IAEFluidStack fluid = this.tank.getFluidInSlot( this.slot );
-			if( fluid != null && fluid.getStackSize() > 0 )
-			{
-				mc.getTextureManager().bindTexture( TextureMap.LOCATION_BLOCKS_TEXTURE );
+                float red = (fluid.getFluid().getColor() >> 16 & 255) / 255.0F;
+                float green = (fluid.getFluid().getColor() >> 8 & 255) / 255.0F;
+                float blue = (fluid.getFluid().getColor() & 255) / 255.0F;
+                GlStateManager.color(red, green, blue);
 
-				float red = ( fluid.getFluid().getColor() >> 16 & 255 ) / 255.0F;
-				float green = ( fluid.getFluid().getColor() >> 8 & 255 ) / 255.0F;
-				float blue = ( fluid.getFluid().getColor() & 255 ) / 255.0F;
-				GlStateManager.color( red, green, blue );
+                TextureAtlasSprite sprite = mc.getTextureMapBlocks()
+                        .getAtlasSprite(fluid.getFluid().getStill().toString());
+                final int scaledHeight = (int) (this.height
+                        * ((float) fluid.getStackSize() / this.tank.getTankProperties()[this.slot].getCapacity()));
 
-				TextureAtlasSprite sprite = mc.getTextureMapBlocks().getAtlasSprite( fluid.getFluid().getStill().toString() );
-				final int scaledHeight = (int) ( this.height * ( (float) fluid.getStackSize() / this.tank.getTankProperties()[this.slot].getCapacity() ) );
+                int iconHeightRemainder = scaledHeight % 16;
+                if (iconHeightRemainder > 0) {
+                    this.drawTexturedModalRect(this.x, this.y + this.height - iconHeightRemainder, sprite, 16,
+                            iconHeightRemainder);
+                }
+                for (int i = 0; i < scaledHeight / 16; i++) {
+                    this.drawTexturedModalRect(this.x, this.y + this.height - iconHeightRemainder - (i + 1) * 16,
+                            sprite, 16, 16);
+                }
+            }
 
-				int iconHeightRemainder = scaledHeight % 16;
-				if( iconHeightRemainder > 0 )
-				{
-					this.drawTexturedModalRect( this.x, this.y + this.height - iconHeightRemainder, sprite, 16, iconHeightRemainder );
-				}
-				for( int i = 0; i < scaledHeight / 16; i++ )
-				{
-					this.drawTexturedModalRect( this.x, this.y + this.height - iconHeightRemainder - ( i + 1 ) * 16, sprite, 16, 16 );
-				}
-			}
+        }
+    }
 
-		}
-	}
+    @Override
+    public String getMessage() {
+        final IAEFluidStack fluid = this.tank.getFluidInSlot(this.slot);
+        if (fluid != null && fluid.getStackSize() > 0) {
+            String desc = fluid.getFluid().getLocalizedName(fluid.getFluidStack());
+            String amountToText = fluid.getStackSize() + "mB";
 
-	@Override
-	public String getMessage()
-	{
-		final IAEFluidStack fluid = this.tank.getFluidInSlot( this.slot );
-		if( fluid != null && fluid.getStackSize() > 0 )
-		{
-			String desc = fluid.getFluid().getLocalizedName( fluid.getFluidStack() );
-			String amountToText = fluid.getStackSize() + "mB";
+            return desc + "\n" + amountToText;
+        }
+        return null;
+    }
 
-			return desc + "\n" + amountToText;
-		}
-		return null;
-	}
+    @Override
+    public int xPos() {
+        return this.x - 2;
+    }
 
-	@Override
-	public int xPos()
-	{
-		return this.x - 2;
-	}
+    @Override
+    public int yPos() {
+        return this.y - 2;
+    }
 
-	@Override
-	public int yPos()
-	{
-		return this.y - 2;
-	}
+    @Override
+    public int getWidth() {
+        return this.width + 4;
+    }
 
-	@Override
-	public int getWidth()
-	{
-		return this.width + 4;
-	}
+    @Override
+    public int getHeight() {
+        return this.height + 4;
+    }
 
-	@Override
-	public int getHeight()
-	{
-		return this.height + 4;
-	}
-
-	@Override
-	public boolean isVisible()
-	{
-		return true;
-	}
+    @Override
+    public boolean isVisible() {
+        return true;
+    }
 
 }

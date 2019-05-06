@@ -22,7 +22,6 @@
 
 package appeng.client.gui.implementations;
 
-
 import java.io.IOException;
 
 import org.lwjgl.input.Mouse;
@@ -48,133 +47,113 @@ import appeng.parts.reporting.PartCraftingTerminal;
 import appeng.parts.reporting.PartPatternTerminal;
 import appeng.parts.reporting.PartTerminal;
 
+public class GuiCraftingStatus extends GuiCraftingCPU {
 
-public class GuiCraftingStatus extends GuiCraftingCPU
-{
+    private final ContainerCraftingStatus status;
+    private GuiButton selectCPU;
 
-	private final ContainerCraftingStatus status;
-	private GuiButton selectCPU;
+    private GuiTabButton originalGuiBtn;
+    private GuiBridge originalGui;
+    private ItemStack myIcon = ItemStack.EMPTY;
 
-	private GuiTabButton originalGuiBtn;
-	private GuiBridge originalGui;
-	private ItemStack myIcon = ItemStack.EMPTY;
+    public GuiCraftingStatus(final InventoryPlayer inventoryPlayer, final ITerminalHost te) {
+        super(new ContainerCraftingStatus(inventoryPlayer, te));
 
-	public GuiCraftingStatus( final InventoryPlayer inventoryPlayer, final ITerminalHost te )
-	{
-		super( new ContainerCraftingStatus( inventoryPlayer, te ) );
+        this.status = (ContainerCraftingStatus) this.inventorySlots;
+        final Object target = this.status.getTarget();
+        final IDefinitions definitions = AEApi.instance().definitions();
+        final IParts parts = definitions.parts();
 
-		this.status = (ContainerCraftingStatus) this.inventorySlots;
-		final Object target = this.status.getTarget();
-		final IDefinitions definitions = AEApi.instance().definitions();
-		final IParts parts = definitions.parts();
+        if (target instanceof WirelessTerminalGuiObject) {
+            this.myIcon = definitions.items().wirelessTerminal().maybeStack(1).orElse(ItemStack.EMPTY);
 
-		if( target instanceof WirelessTerminalGuiObject )
-		{
-			this.myIcon = definitions.items().wirelessTerminal().maybeStack( 1 ).orElse( ItemStack.EMPTY );
+            this.originalGui = GuiBridge.GUI_WIRELESS_TERM;
+        }
 
-			this.originalGui = GuiBridge.GUI_WIRELESS_TERM;
-		}
+        if (target instanceof PartTerminal) {
+            this.myIcon = parts.terminal().maybeStack(1).orElse(ItemStack.EMPTY);
 
-		if( target instanceof PartTerminal )
-		{
-			this.myIcon = parts.terminal().maybeStack( 1 ).orElse( ItemStack.EMPTY );
+            this.originalGui = GuiBridge.GUI_ME;
+        }
 
-			this.originalGui = GuiBridge.GUI_ME;
-		}
+        if (target instanceof PartCraftingTerminal) {
+            this.myIcon = parts.craftingTerminal().maybeStack(1).orElse(ItemStack.EMPTY);
 
-		if( target instanceof PartCraftingTerminal )
-		{
-			this.myIcon = parts.craftingTerminal().maybeStack( 1 ).orElse( ItemStack.EMPTY );
+            this.originalGui = GuiBridge.GUI_CRAFTING_TERMINAL;
+        }
 
-			this.originalGui = GuiBridge.GUI_CRAFTING_TERMINAL;
-		}
+        if (target instanceof PartPatternTerminal) {
+            this.myIcon = parts.patternTerminal().maybeStack(1).orElse(ItemStack.EMPTY);
 
-		if( target instanceof PartPatternTerminal )
-		{
-			this.myIcon = parts.patternTerminal().maybeStack( 1 ).orElse( ItemStack.EMPTY );
+            this.originalGui = GuiBridge.GUI_PATTERN_TERMINAL;
+        }
+    }
 
-			this.originalGui = GuiBridge.GUI_PATTERN_TERMINAL;
-		}
-	}
+    @Override
+    protected void actionPerformed(final GuiButton btn) throws IOException {
+        super.actionPerformed(btn);
 
-	@Override
-	protected void actionPerformed( final GuiButton btn ) throws IOException
-	{
-		super.actionPerformed( btn );
+        final boolean backwards = Mouse.isButtonDown(1);
 
-		final boolean backwards = Mouse.isButtonDown( 1 );
+        if (btn == this.selectCPU) {
+            try {
+                NetworkHandler.instance()
+                        .sendToServer(new PacketValueConfig("Terminal.Cpu", backwards ? "Prev" : "Next"));
+            } catch (final IOException e) {
+                AELog.debug(e);
+            }
+        }
 
-		if( btn == this.selectCPU )
-		{
-			try
-			{
-				NetworkHandler.instance().sendToServer( new PacketValueConfig( "Terminal.Cpu", backwards ? "Prev" : "Next" ) );
-			}
-			catch( final IOException e )
-			{
-				AELog.debug( e );
-			}
-		}
+        if (btn == this.originalGuiBtn) {
+            NetworkHandler.instance().sendToServer(new PacketSwitchGuis(this.originalGui));
+        }
+    }
 
-		if( btn == this.originalGuiBtn )
-		{
-			NetworkHandler.instance().sendToServer( new PacketSwitchGuis( this.originalGui ) );
-		}
-	}
+    @Override
+    public void initGui() {
+        super.initGui();
 
-	@Override
-	public void initGui()
-	{
-		super.initGui();
+        this.selectCPU = new GuiButton(0, this.guiLeft + 8, this.guiTop + this.ySize - 25, 150, 20, GuiText.CraftingCPU
+                .getLocal() + ": " + GuiText.NoCraftingCPUs);
+        // selectCPU.enabled = false;
+        this.buttonList.add(this.selectCPU);
 
-		this.selectCPU = new GuiButton( 0, this.guiLeft + 8, this.guiTop + this.ySize - 25, 150, 20, GuiText.CraftingCPU
-				.getLocal() + ": " + GuiText.NoCraftingCPUs );
-		// selectCPU.enabled = false;
-		this.buttonList.add( this.selectCPU );
+        if (!this.myIcon.isEmpty()) {
+            this.buttonList.add(
+                    this.originalGuiBtn = new GuiTabButton(this.guiLeft + 213, this.guiTop - 4, this.myIcon,
+                            this.myIcon.getDisplayName(), this.itemRender));
+            this.originalGuiBtn.setHideEdge(13);
+        }
+    }
 
-		if( !this.myIcon.isEmpty() )
-		{
-			this.buttonList.add(
-					this.originalGuiBtn = new GuiTabButton( this.guiLeft + 213, this.guiTop - 4, this.myIcon, this.myIcon.getDisplayName(), this.itemRender ) );
-			this.originalGuiBtn.setHideEdge( 13 );
-		}
-	}
+    @Override
+    public void drawScreen(final int mouseX, final int mouseY, final float btn) {
+        this.updateCPUButtonText();
+        super.drawScreen(mouseX, mouseY, btn);
+    }
 
-	@Override
-	public void drawScreen( final int mouseX, final int mouseY, final float btn )
-	{
-		this.updateCPUButtonText();
-		super.drawScreen( mouseX, mouseY, btn );
-	}
+    private void updateCPUButtonText() {
+        String btnTextText = GuiText.NoCraftingJobs.getLocal();
 
-	private void updateCPUButtonText()
-	{
-		String btnTextText = GuiText.NoCraftingJobs.getLocal();
+        if (this.status.selectedCpu >= 0)// && status.selectedCpu < status.cpus.size() )
+        {
+            if (this.status.myName.length() > 0) {
+                final String name = this.status.myName.substring(0, Math.min(20, this.status.myName.length()));
+                btnTextText = GuiText.CPUs.getLocal() + ": " + name;
+            } else {
+                btnTextText = GuiText.CPUs.getLocal() + ": #" + this.status.selectedCpu;
+            }
+        }
 
-		if( this.status.selectedCpu >= 0 )// && status.selectedCpu < status.cpus.size() )
-		{
-			if( this.status.myName.length() > 0 )
-			{
-				final String name = this.status.myName.substring( 0, Math.min( 20, this.status.myName.length() ) );
-				btnTextText = GuiText.CPUs.getLocal() + ": " + name;
-			}
-			else
-			{
-				btnTextText = GuiText.CPUs.getLocal() + ": #" + this.status.selectedCpu;
-			}
-		}
+        if (this.status.noCPU) {
+            btnTextText = GuiText.NoCraftingJobs.getLocal();
+        }
 
-		if( this.status.noCPU )
-		{
-			btnTextText = GuiText.NoCraftingJobs.getLocal();
-		}
+        this.selectCPU.displayString = btnTextText;
+    }
 
-		this.selectCPU.displayString = btnTextText;
-	}
-
-	@Override
-	protected String getGuiDisplayName( final String in )
-	{
-		return in; // the cup name is on the button
-	}
+    @Override
+    protected String getGuiDisplayName(final String in) {
+        return in; // the cup name is on the button
+    }
 }

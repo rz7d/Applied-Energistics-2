@@ -18,16 +18,12 @@
 
 package appeng.block.networking;
 
-
 import appeng.block.AEBaseTileBlock;
 import appeng.helpers.AEGlassMaterial;
 
+public class BlockCreativeEnergyCell extends AEBaseTileBlock {
 
-public class BlockCreativeEnergyCell extends AEBaseTileBlock
-{
-
-	public BlockCreativeEnergyCell()
-	{
-		super( AEGlassMaterial.INSTANCE );
-	}
+    public BlockCreativeEnergyCell() {
+        super(AEGlassMaterial.INSTANCE);
+    }
 }

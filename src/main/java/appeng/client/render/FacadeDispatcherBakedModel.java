@@ -18,7 +18,6 @@
 
 package appeng.client.render;
 
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -40,71 +39,63 @@ import net.minecraft.world.World;
 import appeng.client.render.cablebus.FacadeBuilder;
 import appeng.items.parts.ItemFacade;
 
-
 /**
- * This baked model class is used as a dispatcher to redirect the renderer to the *real* model that should be used based
- * on the item stack.
- * A custom Item Override List is used to accomplish this.
+ * This baked model class is used as a dispatcher to redirect the renderer to
+ * the *real* model that should be used based on the item stack. A custom Item
+ * Override List is used to accomplish this.
  */
-public class FacadeDispatcherBakedModel extends DelegateBakedModel
-{
-	private final VertexFormat format;
-	private final FacadeBuilder facadeBuilder;
-	private final Int2ObjectMap<FacadeBakedItemModel> cache = new Int2ObjectArrayMap<>();
+public class FacadeDispatcherBakedModel extends DelegateBakedModel {
+    private final VertexFormat format;
+    private final FacadeBuilder facadeBuilder;
+    private final Int2ObjectMap<FacadeBakedItemModel> cache = new Int2ObjectArrayMap<>();
 
-	public FacadeDispatcherBakedModel( IBakedModel baseModel, VertexFormat format, FacadeBuilder facadeBuilder )
-	{
-		super( baseModel );
-		this.format = format;
-		this.facadeBuilder = facadeBuilder;
-	}
+    public FacadeDispatcherBakedModel(IBakedModel baseModel, VertexFormat format, FacadeBuilder facadeBuilder) {
+        super(baseModel);
+        this.format = format;
+        this.facadeBuilder = facadeBuilder;
+    }
 
-	// This is never used. See the item override list below.
-	@Override
-	public List<BakedQuad> getQuads( @Nullable IBlockState state, @Nullable EnumFacing side, long rand )
-	{
-		return Collections.emptyList();
-	}
+    // This is never used. See the item override list below.
+    @Override
+    public List<BakedQuad> getQuads(@Nullable IBlockState state, @Nullable EnumFacing side, long rand) {
+        return Collections.emptyList();
+    }
 
-	@Override
-	public boolean isGui3d()
-	{
-		return this.getBaseModel().isGui3d();
-	}
+    @Override
+    public boolean isGui3d() {
+        return this.getBaseModel().isGui3d();
+    }
 
-	@Override
-	public boolean isBuiltInRenderer()
-	{
-		return false;
-	}
+    @Override
+    public boolean isBuiltInRenderer() {
+        return false;
+    }
 
-	@Override
-	public ItemOverrideList getOverrides()
-	{
-		return new ItemOverrideList( Collections.emptyList() )
-		{
-			@Override
-			public IBakedModel handleItemState( IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity )
-			{
-				if( !( stack.getItem() instanceof ItemFacade ) )
-				{
-					return originalModel;
-				}
+    @Override
+    public ItemOverrideList getOverrides() {
+        return new ItemOverrideList(Collections.emptyList()) {
+            @Override
+            public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world,
+                    EntityLivingBase entity) {
+                if (!(stack.getItem() instanceof ItemFacade)) {
+                    return originalModel;
+                }
 
-				ItemFacade itemFacade = (ItemFacade) stack.getItem();
+                ItemFacade itemFacade = (ItemFacade) stack.getItem();
 
-				ItemStack textureItem = itemFacade.getTextureItem( stack );
+                ItemStack textureItem = itemFacade.getTextureItem(stack);
 
-				int hash = Objects.hash( textureItem.getItem().getRegistryName(), textureItem.getMetadata(), textureItem.getTagCompound() );
-				FacadeBakedItemModel model = FacadeDispatcherBakedModel.this.cache.get( hash );
-				if( model == null )
-				{
-				    model = new FacadeBakedItemModel(FacadeDispatcherBakedModel.this.getBaseModel(), textureItem, FacadeDispatcherBakedModel.this.facadeBuilder);
+                int hash = Objects.hash(textureItem.getItem().getRegistryName(), textureItem.getMetadata(),
+                        textureItem.getTagCompound());
+                FacadeBakedItemModel model = FacadeDispatcherBakedModel.this.cache.get(hash);
+                if (model == null) {
+                    model = new FacadeBakedItemModel(FacadeDispatcherBakedModel.this.getBaseModel(), textureItem,
+                            FacadeDispatcherBakedModel.this.facadeBuilder);
                     FacadeDispatcherBakedModel.this.cache.put(hash, model);
                 }
 
-				return model;
-			}
-		};
-	}
+                return model;
+            }
+        };
+    }
 }

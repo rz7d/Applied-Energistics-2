@@ -23,44 +23,41 @@
 
 package appeng.api.parts;
 
-
 import net.minecraft.util.EnumFacing;
 
+public interface IPartCollisionHelper {
 
-public interface IPartCollisionHelper
-{
+    /**
+     * add a collision box, expects 0.0 - 16.0 block coords.
+     *
+     * No complaints about the size, I like using pixels :P
+     *
+     * @param minX minimal x collision
+     * @param minY minimal y collision
+     * @param minZ minimal z collision
+     * @param maxX maximal x collision
+     * @param maxY maximal y collision
+     * @param maxZ maximal z collision
+     */
+    void addBox(double minX, double minY, double minZ, double maxX, double maxY, double maxZ);
 
-	/**
-	 * add a collision box, expects 0.0 - 16.0 block coords.
-	 *
-	 * No complaints about the size, I like using pixels :P
-	 *
-	 * @param minX minimal x collision
-	 * @param minY minimal y collision
-	 * @param minZ minimal z collision
-	 * @param maxX maximal x collision
-	 * @param maxY maximal y collision
-	 * @param maxZ maximal z collision
-	 */
-	void addBox( double minX, double minY, double minZ, double maxX, double maxY, double maxZ );
+    /**
+     * @return east in world space.
+     */
+    EnumFacing getWorldX();
 
-	/**
-	 * @return east in world space.
-	 */
-	EnumFacing getWorldX();
+    /**
+     * @return up in world space.
+     */
+    EnumFacing getWorldY();
 
-	/**
-	 * @return up in world space.
-	 */
-	EnumFacing getWorldY();
+    /**
+     * @return forward in world space.
+     */
+    EnumFacing getWorldZ();
 
-	/**
-	 * @return forward in world space.
-	 */
-	EnumFacing getWorldZ();
-
-	/**
-	 * @return true if this test is to get the BB Collision information.
-	 */
-	boolean isBBCollision();
+    /**
+     * @return true if this test is to get the BB Collision information.
+     */
+    boolean isBBCollision();
 }

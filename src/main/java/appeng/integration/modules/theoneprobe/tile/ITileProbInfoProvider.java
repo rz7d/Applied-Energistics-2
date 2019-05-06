@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.theoneprobe.tile;
 
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -30,16 +29,17 @@ import mcjty.theoneprobe.api.ProbeMode;
 
 import appeng.tile.AEBaseTile;
 
-
 /**
- * Similar to {@link IProbeInfoProvider}, but already providing the {@link AEBaseTile} being looked at.
+ * Similar to {@link IProbeInfoProvider}, but already providing the
+ * {@link AEBaseTile} being looked at.
  *
  */
-public interface ITileProbInfoProvider
-{
+public interface ITileProbInfoProvider {
 
-	/**
-	 * @see IProbeInfoProvider#addProbeInfo(ProbeMode, IProbeInfo, EntityPlayer, World, IBlockState, IProbeHitData)
-	 */
-	void addProbeInfo( AEBaseTile tile, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data );
+    /**
+     * @see IProbeInfoProvider#addProbeInfo(ProbeMode, IProbeInfo, EntityPlayer,
+     *      World, IBlockState, IProbeHitData)
+     */
+    void addProbeInfo(AEBaseTile tile, ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world,
+            IBlockState blockState, IProbeHitData data);
 }

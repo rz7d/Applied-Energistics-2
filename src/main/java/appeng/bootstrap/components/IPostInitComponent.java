@@ -18,14 +18,11 @@
 
 package appeng.bootstrap.components;
 
-
 import net.minecraftforge.fml.relauncher.Side;
 
 import appeng.bootstrap.IBootstrapComponent;
 
-
 @FunctionalInterface
-public interface IPostInitComponent extends IBootstrapComponent
-{
-	void postInitialize( Side side );
+public interface IPostInitComponent extends IBootstrapComponent {
+    void postInitialize(Side side);
 }

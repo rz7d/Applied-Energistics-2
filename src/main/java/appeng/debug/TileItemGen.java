@@ -18,7 +18,6 @@
 
 package appeng.debug;
 
-
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -36,111 +35,89 @@ import net.minecraftforge.items.IItemHandler;
 
 import appeng.tile.AEBaseTile;
 
+public class TileItemGen extends AEBaseTile {
 
-public class TileItemGen extends AEBaseTile
-{
+    private static final Queue<ItemStack> POSSIBLE_ITEMS = new ArrayDeque<>();
 
-	private static final Queue<ItemStack> POSSIBLE_ITEMS = new ArrayDeque<>();
+    private final IItemHandler handler = new QueuedItemHandler();
 
-	private final IItemHandler handler = new QueuedItemHandler();
+    public TileItemGen() {
+        if (POSSIBLE_ITEMS.isEmpty()) {
+            for (final Object obj : Item.REGISTRY) {
+                final Item mi = (Item) obj;
+                if (mi != null && mi != Items.AIR) {
+                    if (mi.isDamageable()) {
+                        for (int dmg = 0; dmg < mi.getMaxDamage(); dmg++) {
+                            POSSIBLE_ITEMS.add(new ItemStack(mi, 1, dmg));
+                        }
+                    } else {
+                        final NonNullList<ItemStack> list = NonNullList.create();
+                        mi.getSubItems(mi.getCreativeTab(), list);
+                        POSSIBLE_ITEMS.addAll(list);
+                    }
+                }
+            }
+        }
+    }
 
-	public TileItemGen()
-	{
-		if( POSSIBLE_ITEMS.isEmpty() )
-		{
-			for( final Object obj : Item.REGISTRY )
-			{
-				final Item mi = (Item) obj;
-				if( mi != null && mi != Items.AIR )
-				{
-					if( mi.isDamageable() )
-					{
-						for( int dmg = 0; dmg < mi.getMaxDamage(); dmg++ )
-						{
-							POSSIBLE_ITEMS.add( new ItemStack( mi, 1, dmg ) );
-						}
-					}
-					else
-					{
-						final NonNullList<ItemStack> list = NonNullList.create();
-						mi.getSubItems( mi.getCreativeTab(), list );
-						POSSIBLE_ITEMS.addAll( list );
-					}
-				}
-			}
-		}
-	}
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        if (CapabilityItemHandler.ITEM_HANDLER_CAPABILITY == capability) {
+            return true;
+        }
+        return super.hasCapability(capability, facing);
+    }
 
-	@Override
-	public boolean hasCapability( Capability<?> capability, @Nullable EnumFacing facing )
-	{
-		if( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY == capability )
-		{
-			return true;
-		}
-		return super.hasCapability( capability, facing );
-	}
+    @Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (CapabilityItemHandler.ITEM_HANDLER_CAPABILITY == capability) {
+            return (T) this.handler;
+        }
+        return super.getCapability(capability, facing);
+    }
 
-	@Override
-	@Nullable
-	public <T> T getCapability( Capability<T> capability, @Nullable EnumFacing facing )
-	{
-		if( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY == capability )
-		{
-			return (T) this.handler;
-		}
-		return super.getCapability( capability, facing );
-	}
+    class QueuedItemHandler implements IItemHandler {
 
-	class QueuedItemHandler implements IItemHandler
-	{
+        @Override
+        @Nonnull
+        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            return stack;
+        }
 
-		@Override
-		@Nonnull
-		public ItemStack insertItem( int slot, @Nonnull ItemStack stack, boolean simulate )
-		{
-			return stack;
-		}
+        @Override
+        @Nonnull
+        public ItemStack getStackInSlot(int slot) {
+            return POSSIBLE_ITEMS.peek() != null ? POSSIBLE_ITEMS.peek().copy() : ItemStack.EMPTY;
+        }
 
-		@Override
-		@Nonnull
-		public ItemStack getStackInSlot( int slot )
-		{
-			return POSSIBLE_ITEMS.peek() != null ? POSSIBLE_ITEMS.peek().copy() : ItemStack.EMPTY;
-		}
+        @Override
+        public int getSlots() {
+            return 1;
+        }
 
-		@Override
-		public int getSlots()
-		{
-			return 1;
-		}
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
 
-		@Override
-		public int getSlotLimit( int slot )
-		{
-			return 1;
-		}
+        @Override
+        @Nonnull
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            final ItemStack is = POSSIBLE_ITEMS.peek();
 
-		@Override
-		@Nonnull
-		public ItemStack extractItem( int slot, int amount, boolean simulate )
-		{
-			final ItemStack is = POSSIBLE_ITEMS.peek();
+            if (is == null) {
+                return ItemStack.EMPTY;
+            }
 
-			if( is == null )
-			{
-				return ItemStack.EMPTY;
-			}
+            return simulate ? is.copy() : this.getNextItem();
+        }
 
-			return simulate ? is.copy() : this.getNextItem();
-		}
+        private ItemStack getNextItem() {
+            final ItemStack is = POSSIBLE_ITEMS.poll();
 
-		private ItemStack getNextItem()
-		{
-			final ItemStack is = POSSIBLE_ITEMS.poll();
-
-			POSSIBLE_ITEMS.add( is );
-			return is.copy();
-		}
-	};
+            POSSIBLE_ITEMS.add(is);
+            return is.copy();
+        }
+    };
 }

@@ -18,7 +18,6 @@
 
 package appeng.bootstrap.components;
 
-
 import java.util.Map;
 
 import javax.annotation.Nonnull;
@@ -29,31 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 
 import appeng.bootstrap.IModelRegistry;
 
-
 /**
- * Registers the models that should by used for an item, including the ability to
- * distinguish by meta.
+ * Registers the models that should by used for an item, including the ability
+ * to distinguish by meta.
  */
-public class ItemModelComponent implements IModelRegistrationComponent
-{
+public class ItemModelComponent implements IModelRegistrationComponent {
 
-	private final Item item;
+    private final Item item;
 
-	private final Map<Integer, ModelResourceLocation> modelsByMeta;
+    private final Map<Integer, ModelResourceLocation> modelsByMeta;
 
-	public ItemModelComponent( @Nonnull Item item, @Nonnull Map<Integer, ModelResourceLocation> modelsByMeta )
-	{
-		this.item = item;
-		this.modelsByMeta = modelsByMeta;
-	}
+    public ItemModelComponent(@Nonnull Item item, @Nonnull Map<Integer, ModelResourceLocation> modelsByMeta) {
+        this.item = item;
+        this.modelsByMeta = modelsByMeta;
+    }
 
-	@Override
-	public void modelRegistration( Side side, IModelRegistry registry )
-	{
-		this.modelsByMeta.forEach( ( meta, model ) ->
-		{
-			registry.setCustomModelResourceLocation( this.item, meta, model );
-		} );
-	}
+    @Override
+    public void modelRegistration(Side side, IModelRegistry registry) {
+        this.modelsByMeta.forEach((meta, model) -> {
+            registry.setCustomModelResourceLocation(this.item, meta, model);
+        });
+    }
 
 }

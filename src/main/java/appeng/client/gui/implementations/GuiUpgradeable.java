@@ -18,7 +18,6 @@
 
 package appeng.client.gui.implementations;
 
-
 import java.io.IOException;
 
 import org.lwjgl.input.Mouse;
@@ -42,162 +41,138 @@ import appeng.core.sync.packets.PacketConfigButton;
 import appeng.parts.automation.PartExportBus;
 import appeng.parts.automation.PartImportBus;
 
+public class GuiUpgradeable extends AEBaseGui {
 
-public class GuiUpgradeable extends AEBaseGui
-{
+    protected final ContainerUpgradeable cvb;
+    protected final IUpgradeableHost bc;
 
-	protected final ContainerUpgradeable cvb;
-	protected final IUpgradeableHost bc;
+    protected GuiImgButton redstoneMode;
+    protected GuiImgButton fuzzyMode;
+    protected GuiImgButton craftMode;
+    protected GuiImgButton schedulingMode;
 
-	protected GuiImgButton redstoneMode;
-	protected GuiImgButton fuzzyMode;
-	protected GuiImgButton craftMode;
-	protected GuiImgButton schedulingMode;
+    public GuiUpgradeable(final InventoryPlayer inventoryPlayer, final IUpgradeableHost te) {
+        this(new ContainerUpgradeable(inventoryPlayer, te));
+    }
 
-	public GuiUpgradeable( final InventoryPlayer inventoryPlayer, final IUpgradeableHost te )
-	{
-		this( new ContainerUpgradeable( inventoryPlayer, te ) );
-	}
+    public GuiUpgradeable(final ContainerUpgradeable te) {
+        super(te);
+        this.cvb = te;
 
-	public GuiUpgradeable( final ContainerUpgradeable te )
-	{
-		super( te );
-		this.cvb = te;
+        this.bc = (IUpgradeableHost) te.getTarget();
+        this.xSize = this.hasToolbox() ? 246 : 211;
+        this.ySize = 184;
+    }
 
-		this.bc = (IUpgradeableHost) te.getTarget();
-		this.xSize = this.hasToolbox() ? 246 : 211;
-		this.ySize = 184;
-	}
+    protected boolean hasToolbox() {
+        return ((ContainerUpgradeable) this.inventorySlots).hasToolbox();
+    }
 
-	protected boolean hasToolbox()
-	{
-		return ( (ContainerUpgradeable) this.inventorySlots ).hasToolbox();
-	}
+    @Override
+    public void initGui() {
+        super.initGui();
+        this.addButtons();
+    }
 
-	@Override
-	public void initGui()
-	{
-		super.initGui();
-		this.addButtons();
-	}
+    protected void addButtons() {
+        this.redstoneMode = new GuiImgButton(this.guiLeft - 18, this.guiTop + 8, Settings.REDSTONE_CONTROLLED,
+                RedstoneMode.IGNORE);
+        this.fuzzyMode = new GuiImgButton(this.guiLeft - 18, this.guiTop + 28, Settings.FUZZY_MODE,
+                FuzzyMode.IGNORE_ALL);
+        this.craftMode = new GuiImgButton(this.guiLeft - 18, this.guiTop + 48, Settings.CRAFT_ONLY, YesNo.NO);
+        this.schedulingMode = new GuiImgButton(this.guiLeft - 18, this.guiTop + 68, Settings.SCHEDULING_MODE,
+                SchedulingMode.DEFAULT);
 
-	protected void addButtons()
-	{
-		this.redstoneMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 8, Settings.REDSTONE_CONTROLLED, RedstoneMode.IGNORE );
-		this.fuzzyMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 28, Settings.FUZZY_MODE, FuzzyMode.IGNORE_ALL );
-		this.craftMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 48, Settings.CRAFT_ONLY, YesNo.NO );
-		this.schedulingMode = new GuiImgButton( this.guiLeft - 18, this.guiTop + 68, Settings.SCHEDULING_MODE, SchedulingMode.DEFAULT );
+        this.buttonList.add(this.craftMode);
+        this.buttonList.add(this.redstoneMode);
+        this.buttonList.add(this.fuzzyMode);
+        this.buttonList.add(this.schedulingMode);
+    }
 
-		this.buttonList.add( this.craftMode );
-		this.buttonList.add( this.redstoneMode );
-		this.buttonList.add( this.fuzzyMode );
-		this.buttonList.add( this.schedulingMode );
-	}
+    @Override
+    public void drawFG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
+        this.fontRenderer.drawString(this.getGuiDisplayName(this.getName().getLocal()), 8, 6, 4210752);
+        this.fontRenderer.drawString(GuiText.inventory.getLocal(), 8, this.ySize - 96 + 3, 4210752);
 
-	@Override
-	public void drawFG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
-	{
-		this.fontRenderer.drawString( this.getGuiDisplayName( this.getName().getLocal() ), 8, 6, 4210752 );
-		this.fontRenderer.drawString( GuiText.inventory.getLocal(), 8, this.ySize - 96 + 3, 4210752 );
+        if (this.redstoneMode != null) {
+            this.redstoneMode.set(this.cvb.getRedStoneMode());
+        }
 
-		if( this.redstoneMode != null )
-		{
-			this.redstoneMode.set( this.cvb.getRedStoneMode() );
-		}
+        if (this.fuzzyMode != null) {
+            this.fuzzyMode.set(this.cvb.getFuzzyMode());
+        }
 
-		if( this.fuzzyMode != null )
-		{
-			this.fuzzyMode.set( this.cvb.getFuzzyMode() );
-		}
+        if (this.craftMode != null) {
+            this.craftMode.set(this.cvb.getCraftingMode());
+        }
 
-		if( this.craftMode != null )
-		{
-			this.craftMode.set( this.cvb.getCraftingMode() );
-		}
+        if (this.schedulingMode != null) {
+            this.schedulingMode.set(this.cvb.getSchedulingMode());
+        }
+    }
 
-		if( this.schedulingMode != null )
-		{
-			this.schedulingMode.set( this.cvb.getSchedulingMode() );
-		}
-	}
+    @Override
+    public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
+        this.handleButtonVisibility();
 
-	@Override
-	public void drawBG( final int offsetX, final int offsetY, final int mouseX, final int mouseY )
-	{
-		this.handleButtonVisibility();
+        this.bindTexture(this.getBackground());
+        this.drawTexturedModalRect(offsetX, offsetY, 0, 0, 211 - 34, this.ySize);
+        if (this.drawUpgrades()) {
+            this.drawTexturedModalRect(offsetX + 177, offsetY, 177, 0, 35, 14 + this.cvb.availableUpgrades() * 18);
+        }
+        if (this.hasToolbox()) {
+            this.drawTexturedModalRect(offsetX + 178, offsetY + this.ySize - 90, 178, this.ySize - 90, 68, 68);
+        }
+    }
 
-		this.bindTexture( this.getBackground() );
-		this.drawTexturedModalRect( offsetX, offsetY, 0, 0, 211 - 34, this.ySize );
-		if( this.drawUpgrades() )
-		{
-			this.drawTexturedModalRect( offsetX + 177, offsetY, 177, 0, 35, 14 + this.cvb.availableUpgrades() * 18 );
-		}
-		if( this.hasToolbox() )
-		{
-			this.drawTexturedModalRect( offsetX + 178, offsetY + this.ySize - 90, 178, this.ySize - 90, 68, 68 );
-		}
-	}
+    protected void handleButtonVisibility() {
+        if (this.redstoneMode != null) {
+            this.redstoneMode.setVisibility(this.bc.getInstalledUpgrades(Upgrades.REDSTONE) > 0);
+        }
+        if (this.fuzzyMode != null) {
+            this.fuzzyMode.setVisibility(this.bc.getInstalledUpgrades(Upgrades.FUZZY) > 0);
+        }
+        if (this.craftMode != null) {
+            this.craftMode.setVisibility(this.bc.getInstalledUpgrades(Upgrades.CRAFTING) > 0);
+        }
+        if (this.schedulingMode != null) {
+            this.schedulingMode.setVisibility(
+                    this.bc.getInstalledUpgrades(Upgrades.CAPACITY) > 0 && this.bc instanceof PartExportBus);
+        }
+    }
 
-	protected void handleButtonVisibility()
-	{
-		if( this.redstoneMode != null )
-		{
-			this.redstoneMode.setVisibility( this.bc.getInstalledUpgrades( Upgrades.REDSTONE ) > 0 );
-		}
-		if( this.fuzzyMode != null )
-		{
-			this.fuzzyMode.setVisibility( this.bc.getInstalledUpgrades( Upgrades.FUZZY ) > 0 );
-		}
-		if( this.craftMode != null )
-		{
-			this.craftMode.setVisibility( this.bc.getInstalledUpgrades( Upgrades.CRAFTING ) > 0 );
-		}
-		if( this.schedulingMode != null )
-		{
-			this.schedulingMode.setVisibility( this.bc.getInstalledUpgrades( Upgrades.CAPACITY ) > 0 && this.bc instanceof PartExportBus );
-		}
-	}
+    protected String getBackground() {
+        return "guis/bus.png";
+    }
 
-	protected String getBackground()
-	{
-		return "guis/bus.png";
-	}
+    protected boolean drawUpgrades() {
+        return true;
+    }
 
-	protected boolean drawUpgrades()
-	{
-		return true;
-	}
+    protected GuiText getName() {
+        return this.bc instanceof PartImportBus ? GuiText.ImportBus : GuiText.ExportBus;
+    }
 
-	protected GuiText getName()
-	{
-		return this.bc instanceof PartImportBus ? GuiText.ImportBus : GuiText.ExportBus;
-	}
+    @Override
+    protected void actionPerformed(final GuiButton btn) throws IOException {
+        super.actionPerformed(btn);
 
-	@Override
-	protected void actionPerformed( final GuiButton btn ) throws IOException
-	{
-		super.actionPerformed( btn );
+        final boolean backwards = Mouse.isButtonDown(1);
 
-		final boolean backwards = Mouse.isButtonDown( 1 );
+        if (btn == this.redstoneMode) {
+            NetworkHandler.instance().sendToServer(new PacketConfigButton(this.redstoneMode.getSetting(), backwards));
+        }
 
-		if( btn == this.redstoneMode )
-		{
-			NetworkHandler.instance().sendToServer( new PacketConfigButton( this.redstoneMode.getSetting(), backwards ) );
-		}
+        if (btn == this.craftMode) {
+            NetworkHandler.instance().sendToServer(new PacketConfigButton(this.craftMode.getSetting(), backwards));
+        }
 
-		if( btn == this.craftMode )
-		{
-			NetworkHandler.instance().sendToServer( new PacketConfigButton( this.craftMode.getSetting(), backwards ) );
-		}
+        if (btn == this.fuzzyMode) {
+            NetworkHandler.instance().sendToServer(new PacketConfigButton(this.fuzzyMode.getSetting(), backwards));
+        }
 
-		if( btn == this.fuzzyMode )
-		{
-			NetworkHandler.instance().sendToServer( new PacketConfigButton( this.fuzzyMode.getSetting(), backwards ) );
-		}
-
-		if( btn == this.schedulingMode )
-		{
-			NetworkHandler.instance().sendToServer( new PacketConfigButton( this.schedulingMode.getSetting(), backwards ) );
-		}
-	}
+        if (btn == this.schedulingMode) {
+            NetworkHandler.instance().sendToServer(new PacketConfigButton(this.schedulingMode.getSetting(), backwards));
+        }
+    }
 }

@@ -18,7 +18,6 @@
 
 package appeng.bootstrap;
 
-
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -30,31 +29,30 @@ import appeng.api.definitions.IBlockDefinition;
 import appeng.bootstrap.definitions.TileEntityDefinition;
 import appeng.core.features.AEFeature;
 
+public interface IBlockBuilder {
+    IBlockBuilder bootstrap(BiFunction<Block, Item, IBootstrapComponent> component);
 
-public interface IBlockBuilder
-{
-	IBlockBuilder bootstrap( BiFunction<Block, Item, IBootstrapComponent> component );
+    IBlockBuilder features(AEFeature... features);
 
-	IBlockBuilder features( AEFeature... features );
+    IBlockBuilder addFeatures(AEFeature... features);
 
-	IBlockBuilder addFeatures( AEFeature... features );
+    IBlockBuilder rendering(BlockRenderingCustomizer callback);
 
-	IBlockBuilder rendering( BlockRenderingCustomizer callback );
+    IBlockBuilder tileEntity(TileEntityDefinition tileEntityDefinition);
 
-	IBlockBuilder tileEntity( TileEntityDefinition tileEntityDefinition );
+    /**
+     * Don't register an item for this block.
+     */
+    IBlockBuilder disableItem();
 
-	/**
-	 * Don't register an item for this block.
-	 */
-	IBlockBuilder disableItem();
+    /**
+     * Forces this block's item to uses a custom model, instead of using the default
+     * block state as the item model. The model has the same name as the registry
+     * name.
+     */
+    IBlockBuilder useCustomItemModel();
 
-	/**
-	 * Forces this block's item to uses a custom model, instead of using the default block state as the item model.
-	 * The model has the same name as the registry name.
-	 */
-	IBlockBuilder useCustomItemModel();
+    IBlockBuilder item(Function<Block, ItemBlock> factory);
 
-	IBlockBuilder item( Function<Block, ItemBlock> factory );
-
-	<T extends IBlockDefinition> T build();
+    <T extends IBlockDefinition> T build();
 }

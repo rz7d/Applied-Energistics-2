@@ -18,7 +18,6 @@
 
 package appeng.core;
 
-
 import java.util.List;
 import java.util.Random;
 
@@ -35,38 +34,38 @@ import appeng.client.ActionKey;
 import appeng.client.EffectType;
 import appeng.core.sync.AppEngPacket;
 
+public abstract class CommonHelper {
 
-public abstract class CommonHelper
-{
+    public abstract void preinit();
 
-	public abstract void preinit();
+    public abstract void init();
 
-	public abstract void init();
+    public abstract World getWorld();
 
-	public abstract World getWorld();
+    public abstract void bindTileEntitySpecialRenderer(Class<? extends TileEntity> tile, AEBaseBlock blk);
 
-	public abstract void bindTileEntitySpecialRenderer( Class<? extends TileEntity> tile, AEBaseBlock blk );
+    public abstract List<EntityPlayer> getPlayers();
 
-	public abstract List<EntityPlayer> getPlayers();
+    public abstract void sendToAllNearExcept(EntityPlayer p, double x, double y, double z, double dist, World w,
+            AppEngPacket packet);
 
-	public abstract void sendToAllNearExcept( EntityPlayer p, double x, double y, double z, double dist, World w, AppEngPacket packet );
+    public abstract void spawnEffect(EffectType effect, World world, double posX, double posY, double posZ,
+            Object extra);
 
-	public abstract void spawnEffect( EffectType effect, World world, double posX, double posY, double posZ, Object extra );
+    public abstract boolean shouldAddParticles(Random r);
 
-	public abstract boolean shouldAddParticles( Random r );
+    public abstract RayTraceResult getRTR();
 
-	public abstract RayTraceResult getRTR();
+    public abstract void postInit();
 
-	public abstract void postInit();
+    public abstract CableRenderMode getRenderMode();
 
-	public abstract CableRenderMode getRenderMode();
+    public abstract void triggerUpdates();
 
-	public abstract void triggerUpdates();
+    public abstract void updateRenderMode(EntityPlayer player);
 
-	public abstract void updateRenderMode( EntityPlayer player );
+    public abstract boolean isKeyPressed(@Nonnull final ActionKey key);
 
-	public abstract boolean isKeyPressed( @Nonnull final ActionKey key );
-
-	public abstract boolean isActionKey( @Nonnull final ActionKey key, int pressedKeyCode );
+    public abstract boolean isActionKey(@Nonnull final ActionKey key, int pressedKeyCode);
 
 }

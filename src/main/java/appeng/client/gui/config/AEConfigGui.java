@@ -18,7 +18,6 @@
 
 package appeng.client.gui.config;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,42 +30,35 @@ import net.minecraftforge.fml.client.config.IConfigElement;
 import appeng.core.AEConfig;
 import appeng.core.AppEng;
 
+public class AEConfigGui extends GuiConfig {
 
-public class AEConfigGui extends GuiConfig
-{
+    public AEConfigGui(final GuiScreen parent) {
+        super(parent, getConfigElements(), AppEng.MOD_ID, false, false,
+                GuiConfig.getAbridgedConfigPath(AEConfig.instance().getFilePath()));
+    }
 
-	public AEConfigGui( final GuiScreen parent )
-	{
-		super( parent, getConfigElements(), AppEng.MOD_ID, false, false, GuiConfig.getAbridgedConfigPath( AEConfig.instance().getFilePath() ) );
-	}
+    private static List<IConfigElement> getConfigElements() {
+        final List<IConfigElement> list = new ArrayList<>();
 
-	private static List<IConfigElement> getConfigElements()
-	{
-		final List<IConfigElement> list = new ArrayList<>();
+        for (final String cat : AEConfig.instance().getCategoryNames()) {
+            if (cat.equals("versionchecker")) {
+                continue;
+            }
 
-		for( final String cat : AEConfig.instance().getCategoryNames() )
-		{
-			if( cat.equals( "versionchecker" ) )
-			{
-				continue;
-			}
+            if (cat.equals("settings")) {
+                continue;
+            }
 
-			if( cat.equals( "settings" ) )
-			{
-				continue;
-			}
+            final ConfigCategory cc = AEConfig.instance().getCategory(cat);
 
-			final ConfigCategory cc = AEConfig.instance().getCategory( cat );
+            if (cc.isChild()) {
+                continue;
+            }
 
-			if( cc.isChild() )
-			{
-				continue;
-			}
+            final ConfigElement ce = new ConfigElement(cc);
+            list.add(ce);
+        }
 
-			final ConfigElement ce = new ConfigElement( cc );
-			list.add( ce );
-		}
-
-		return list;
-	}
+        return list;
+    }
 }

@@ -23,7 +23,6 @@
 
 package appeng.api.features;
 
-
 import java.util.Collection;
 
 import javax.annotation.Nonnull;
@@ -31,71 +30,70 @@ import javax.annotation.Nullable;
 
 import net.minecraft.item.ItemStack;
 
-
 /**
  * Lets you manipulate Grinder Recipes, by adding or editing existing ones.
  */
-public interface IGrinderRegistry
-{
+public interface IGrinderRegistry {
 
-	/**
-	 * Extensible way to create a grinder recipe.
-	 *
-	 * @return builder for grinder recipes
-	 */
-	@Nonnull
-	IGrinderRecipeBuilder builder();
+    /**
+     * Extensible way to create a grinder recipe.
+     *
+     * @return builder for grinder recipes
+     */
+    @Nonnull
+    IGrinderRecipeBuilder builder();
 
-	/**
-	 * An immutable list of the currently registered recipes.
-	 *
-	 * @return currentlyRegisteredRecipes
-	 */
-	@Nonnull
-	Collection<IGrinderRecipe> getRecipes();
+    /**
+     * An immutable list of the currently registered recipes.
+     *
+     * @return currentlyRegisteredRecipes
+     */
+    @Nonnull
+    Collection<IGrinderRecipe> getRecipes();
 
-	/**
-	 * Add a new recipe to the registry.
-	 */
-	boolean addRecipe( IGrinderRecipe recipe );
+    /**
+     * Add a new recipe to the registry.
+     */
+    boolean addRecipe(IGrinderRecipe recipe);
 
-	/**
-	 * Remove the specific from the recipe list.
-	 * 
-	 * @param recipe The recipe to be removed.
-	 * @return true, if it was removed
-	 */
-	boolean removeRecipe( @Nonnull IGrinderRecipe recipe );
+    /**
+     * Remove the specific from the recipe list.
+     * 
+     * @param recipe The recipe to be removed.
+     * @return true, if it was removed
+     */
+    boolean removeRecipe(@Nonnull IGrinderRecipe recipe);
 
-	/**
-	 * Searches for a recipe for a given input, and returns it.
-	 *
-	 * @param input The {@link ItemStack} to be grinded.
-	 *
-	 * @return identified recipe or null
-	 */
-	@Nullable
-	IGrinderRecipe getRecipeForInput( @Nonnull ItemStack input );
+    /**
+     * Searches for a recipe for a given input, and returns it.
+     *
+     * @param input The {@link ItemStack} to be grinded.
+     *
+     * @return identified recipe or null
+     */
+    @Nullable
+    IGrinderRecipe getRecipeForInput(@Nonnull ItemStack input);
 
-	/**
-	 * Allows do add a custom ratio from an ore to dust when being grinded.
-	 * 
-	 * The default ratio is 1 ore to 2 dusts.
-	 * 
-	 * These have to be added before any recipe is registered. Otherwise it will use the default value.
-	 * 
-	 * @param oredictName The name of the ore;
-	 * @param ratio The amount, must be > 0;
-	 */
-	void addDustRatio( @Nonnull String oredictName, int ratio );
+    /**
+     * Allows do add a custom ratio from an ore to dust when being grinded.
+     * 
+     * The default ratio is 1 ore to 2 dusts.
+     * 
+     * These have to be added before any recipe is registered. Otherwise it will use
+     * the default value.
+     * 
+     * @param oredictName The name of the ore;
+     * @param ratio       The amount, must be > 0;
+     */
+    void addDustRatio(@Nonnull String oredictName, int ratio);
 
-	/**
-	 * Remove a custom ratio for a specific ore name.
-	 * 
-	 * Will use the default of 2 value afterwards.
-	 * 
-	 * @param oredictName The name of the ore;
-	 */
-	boolean removeDustRatio( @Nonnull String oredictName );
+    /**
+     * Remove a custom ratio for a specific ore name.
+     * 
+     * Will use the default of 2 value afterwards.
+     * 
+     * @param oredictName The name of the ore;
+     */
+    boolean removeDustRatio(@Nonnull String oredictName);
 
 }

@@ -18,7 +18,6 @@
 
 package appeng.tile.misc;
 
-
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
@@ -81,295 +80,251 @@ import appeng.util.inv.IAEAppEngInventory;
 import appeng.util.inv.InvOperation;
 import appeng.util.item.AEItemStack;
 
+public class TileSecurityStation extends AENetworkTile implements ITerminalHost, IAEAppEngInventory, ILocatable,
+        IConfigManagerHost, ISecurityProvider, IColorableTile {
 
-public class TileSecurityStation extends AENetworkTile implements ITerminalHost, IAEAppEngInventory, ILocatable, IConfigManagerHost, ISecurityProvider, IColorableTile
-{
+    private static int difference = 0;
+    private final AppEngInternalInventory configSlot = new AppEngInternalInventory(this, 1);
+    private final IConfigManager cm = new ConfigManager(this);
+    private final SecurityStationInventory inventory = new SecurityStationInventory(this);
+    private final MEMonitorHandler<IAEItemStack> securityMonitor = new MEMonitorHandler<>(this.inventory);
+    private long securityKey;
+    private AEColor paintedColor = AEColor.TRANSPARENT;
+    private boolean isActive = false;
 
-	private static int difference = 0;
-	private final AppEngInternalInventory configSlot = new AppEngInternalInventory( this, 1 );
-	private final IConfigManager cm = new ConfigManager( this );
-	private final SecurityStationInventory inventory = new SecurityStationInventory( this );
-	private final MEMonitorHandler<IAEItemStack> securityMonitor = new MEMonitorHandler<>( this.inventory );
-	private long securityKey;
-	private AEColor paintedColor = AEColor.TRANSPARENT;
-	private boolean isActive = false;
+    public TileSecurityStation() {
+        this.getProxy().setFlags(GridFlags.REQUIRE_CHANNEL);
+        this.getProxy().setIdlePowerUsage(2.0);
+        difference++;
 
-	public TileSecurityStation()
-	{
-		this.getProxy().setFlags( GridFlags.REQUIRE_CHANNEL );
-		this.getProxy().setIdlePowerUsage( 2.0 );
-		difference++;
+        this.securityKey = System.currentTimeMillis() * 10 + difference;
+        if (difference > 10) {
+            difference = 0;
+        }
 
-		this.securityKey = System.currentTimeMillis() * 10 + difference;
-		if( difference > 10 )
-		{
-			difference = 0;
-		}
+        this.cm.registerSetting(Settings.SORT_BY, SortOrder.NAME);
+        this.cm.registerSetting(Settings.VIEW_MODE, ViewItems.ALL);
+        this.cm.registerSetting(Settings.SORT_DIRECTION, SortDir.ASCENDING);
+    }
 
-		this.cm.registerSetting( Settings.SORT_BY, SortOrder.NAME );
-		this.cm.registerSetting( Settings.VIEW_MODE, ViewItems.ALL );
-		this.cm.registerSetting( Settings.SORT_DIRECTION, SortDir.ASCENDING );
-	}
+    @Override
+    public void onChangeInventory(final IItemHandler inv, final int slot, final InvOperation mc,
+            final ItemStack removedStack, final ItemStack newStack) {
 
-	@Override
-	public void onChangeInventory( final IItemHandler inv, final int slot, final InvOperation mc, final ItemStack removedStack, final ItemStack newStack )
-	{
+    }
 
-	}
+    @Override
+    public void getDrops(final World w, final BlockPos pos, final List<ItemStack> drops) {
+        if (!ItemHandlerUtil.isEmpty(this.getConfigSlot())) {
+            drops.add(this.getConfigSlot().getStackInSlot(0));
+        }
 
-	@Override
-	public void getDrops( final World w, final BlockPos pos, final List<ItemStack> drops )
-	{
-		if( !ItemHandlerUtil.isEmpty( this.getConfigSlot() ) )
-		{
-			drops.add( this.getConfigSlot().getStackInSlot( 0 ) );
-		}
+        for (final IAEItemStack ais : this.inventory.getStoredItems()) {
+            drops.add(ais.createItemStack());
+        }
+    }
 
-		for( final IAEItemStack ais : this.inventory.getStoredItems() )
-		{
-			drops.add( ais.createItemStack() );
-		}
-	}
+    IMEInventoryHandler<IAEItemStack> getSecurityInventory() {
+        return this.inventory;
+    }
 
-	IMEInventoryHandler<IAEItemStack> getSecurityInventory()
-	{
-		return this.inventory;
-	}
+    @Override
+    protected boolean readFromStream(final ByteBuf data) throws IOException {
+        final boolean c = super.readFromStream(data);
+        final boolean wasActive = this.isActive;
+        this.isActive = data.readBoolean();
 
-	@Override
-	protected boolean readFromStream( final ByteBuf data ) throws IOException
-	{
-		final boolean c = super.readFromStream( data );
-		final boolean wasActive = this.isActive;
-		this.isActive = data.readBoolean();
+        final AEColor oldPaintedColor = this.paintedColor;
+        this.paintedColor = AEColor.values()[data.readByte()];
 
-		final AEColor oldPaintedColor = this.paintedColor;
-		this.paintedColor = AEColor.values()[data.readByte()];
+        return oldPaintedColor != this.paintedColor || wasActive != this.isActive || c;
+    }
 
-		return oldPaintedColor != this.paintedColor || wasActive != this.isActive || c;
-	}
+    @Override
+    protected void writeToStream(final ByteBuf data) throws IOException {
+        super.writeToStream(data);
+        data.writeBoolean(this.getProxy().isActive());
+        data.writeByte(this.paintedColor.ordinal());
+    }
 
-	@Override
-	protected void writeToStream( final ByteBuf data ) throws IOException
-	{
-		super.writeToStream( data );
-		data.writeBoolean( this.getProxy().isActive() );
-		data.writeByte( this.paintedColor.ordinal() );
-	}
+    @Override
+    public NBTTagCompound writeToNBT(final NBTTagCompound data) {
+        super.writeToNBT(data);
+        this.cm.writeToNBT(data);
+        data.setByte("paintedColor", (byte) this.paintedColor.ordinal());
 
-	@Override
-	public NBTTagCompound writeToNBT( final NBTTagCompound data )
-	{
-		super.writeToNBT( data );
-		this.cm.writeToNBT( data );
-		data.setByte( "paintedColor", (byte) this.paintedColor.ordinal() );
+        data.setLong("securityKey", this.securityKey);
+        this.getConfigSlot().writeToNBT(data, "config");
 
-		data.setLong( "securityKey", this.securityKey );
-		this.getConfigSlot().writeToNBT( data, "config" );
+        final NBTTagCompound storedItems = new NBTTagCompound();
 
-		final NBTTagCompound storedItems = new NBTTagCompound();
+        int offset = 0;
+        for (final IAEItemStack ais : this.inventory.getStoredItems()) {
+            final NBTTagCompound it = new NBTTagCompound();
+            ais.createItemStack().writeToNBT(it);
+            storedItems.setTag(String.valueOf(offset), it);
+            offset++;
+        }
 
-		int offset = 0;
-		for( final IAEItemStack ais : this.inventory.getStoredItems() )
-		{
-			final NBTTagCompound it = new NBTTagCompound();
-			ais.createItemStack().writeToNBT( it );
-			storedItems.setTag( String.valueOf( offset ), it );
-			offset++;
-		}
+        data.setTag("storedItems", storedItems);
+        return data;
+    }
 
-		data.setTag( "storedItems", storedItems );
-		return data;
-	}
+    @Override
+    public void readFromNBT(final NBTTagCompound data) {
+        super.readFromNBT(data);
+        this.cm.readFromNBT(data);
+        if (data.hasKey("paintedColor")) {
+            this.paintedColor = AEColor.values()[data.getByte("paintedColor")];
+        }
 
-	@Override
-	public void readFromNBT( final NBTTagCompound data )
-	{
-		super.readFromNBT( data );
-		this.cm.readFromNBT( data );
-		if( data.hasKey( "paintedColor" ) )
-		{
-			this.paintedColor = AEColor.values()[data.getByte( "paintedColor" )];
-		}
+        this.securityKey = data.getLong("securityKey");
+        this.getConfigSlot().readFromNBT(data, "config");
 
-		this.securityKey = data.getLong( "securityKey" );
-		this.getConfigSlot().readFromNBT( data, "config" );
+        final NBTTagCompound storedItems = data.getCompoundTag("storedItems");
+        for (final Object key : storedItems.getKeySet()) {
+            final NBTBase obj = storedItems.getTag((String) key);
+            if (obj instanceof NBTTagCompound) {
+                this.inventory.getStoredItems().add(AEItemStack.fromItemStack(new ItemStack((NBTTagCompound) obj)));
+            }
+        }
+    }
 
-		final NBTTagCompound storedItems = data.getCompoundTag( "storedItems" );
-		for( final Object key : storedItems.getKeySet() )
-		{
-			final NBTBase obj = storedItems.getTag( (String) key );
-			if( obj instanceof NBTTagCompound )
-			{
-				this.inventory.getStoredItems().add( AEItemStack.fromItemStack( new ItemStack( (NBTTagCompound) obj ) ) );
-			}
-		}
-	}
+    public void inventoryChanged() {
+        try {
+            this.saveChanges();
+            this.getProxy().getGrid().postEvent(new MENetworkSecurityChange());
+        } catch (final GridAccessException e) {
+            // :P
+        }
+    }
 
-	public void inventoryChanged()
-	{
-		try
-		{
-			this.saveChanges();
-			this.getProxy().getGrid().postEvent( new MENetworkSecurityChange() );
-		}
-		catch( final GridAccessException e )
-		{
-			// :P
-		}
-	}
+    @MENetworkEventSubscribe
+    public void bootUpdate(final MENetworkChannelsChanged changed) {
+        this.markForUpdate();
+    }
 
-	@MENetworkEventSubscribe
-	public void bootUpdate( final MENetworkChannelsChanged changed )
-	{
-		this.markForUpdate();
-	}
+    @MENetworkEventSubscribe
+    public void powerUpdate(final MENetworkPowerStatusChange changed) {
+        this.markForUpdate();
+    }
 
-	@MENetworkEventSubscribe
-	public void powerUpdate( final MENetworkPowerStatusChange changed )
-	{
-		this.markForUpdate();
-	}
+    @Override
+    public AECableType getCableConnectionType(final AEPartLocation dir) {
+        return AECableType.SMART;
+    }
 
-	@Override
-	public AECableType getCableConnectionType( final AEPartLocation dir )
-	{
-		return AECableType.SMART;
-	}
+    @Override
+    public void onChunkUnload() {
+        super.onChunkUnload();
+        MinecraftForge.EVENT_BUS.post(new LocatableEventAnnounce(this, LocatableEvent.UNREGISTER));
+        this.isActive = false;
+    }
 
-	@Override
-	public void onChunkUnload()
-	{
-		super.onChunkUnload();
-		MinecraftForge.EVENT_BUS.post( new LocatableEventAnnounce( this, LocatableEvent.UNREGISTER ) );
-		this.isActive = false;
-	}
+    @Override
+    public void onReady() {
+        super.onReady();
+        if (Platform.isServer()) {
+            this.isActive = true;
+            MinecraftForge.EVENT_BUS.post(new LocatableEventAnnounce(this, LocatableEvent.REGISTER));
+        }
+    }
 
-	@Override
-	public void onReady()
-	{
-		super.onReady();
-		if( Platform.isServer() )
-		{
-			this.isActive = true;
-			MinecraftForge.EVENT_BUS.post( new LocatableEventAnnounce( this, LocatableEvent.REGISTER ) );
-		}
-	}
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        MinecraftForge.EVENT_BUS.post(new LocatableEventAnnounce(this, LocatableEvent.UNREGISTER));
+        this.isActive = false;
+    }
 
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
-		MinecraftForge.EVENT_BUS.post( new LocatableEventAnnounce( this, LocatableEvent.UNREGISTER ) );
-		this.isActive = false;
-	}
+    @Override
+    public DimensionalCoord getLocation() {
+        return new DimensionalCoord(this);
+    }
 
-	@Override
-	public DimensionalCoord getLocation()
-	{
-		return new DimensionalCoord( this );
-	}
+    public boolean isActive() {
+        return this.isActive;
+    }
 
-	public boolean isActive()
-	{
-		return this.isActive;
-	}
+    @Override
+    public <T extends IAEStack<T>> IMEMonitor<T> getInventory(IStorageChannel<T> channel) {
+        if (channel == AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class)) {
+            return (IMEMonitor<T>) this.securityMonitor;
+        }
+        return null;
 
-	@Override
-	public <T extends IAEStack<T>> IMEMonitor<T> getInventory( IStorageChannel<T> channel )
-	{
-		if( channel == AEApi.instance().storage().getStorageChannel( IItemStorageChannel.class ) )
-		{
-			return (IMEMonitor<T>) this.securityMonitor;
-		}
-		return null;
+    }
 
-	}
+    @Override
+    public long getLocatableSerial() {
+        return this.securityKey;
+    }
 
-	@Override
-	public long getLocatableSerial()
-	{
-		return this.securityKey;
-	}
+    public boolean isPowered() {
+        return this.getProxy().isActive();
+    }
 
-	public boolean isPowered()
-	{
-		return this.getProxy().isActive();
-	}
+    @Override
+    public IConfigManager getConfigManager() {
+        return this.cm;
+    }
 
-	@Override
-	public IConfigManager getConfigManager()
-	{
-		return this.cm;
-	}
+    @Override
+    public void updateSetting(final IConfigManager manager, final Enum settingName, final Enum newValue) {
 
-	@Override
-	public void updateSetting( final IConfigManager manager, final Enum settingName, final Enum newValue )
-	{
+    }
 
-	}
+    @Override
+    public long getSecurityKey() {
+        return this.securityKey;
+    }
 
-	@Override
-	public long getSecurityKey()
-	{
-		return this.securityKey;
-	}
+    @Override
+    public void readPermissions(final Map<Integer, EnumSet<SecurityPermissions>> playerPerms) {
+        final IPlayerRegistry pr = AEApi.instance().registries().players();
 
-	@Override
-	public void readPermissions( final Map<Integer, EnumSet<SecurityPermissions>> playerPerms )
-	{
-		final IPlayerRegistry pr = AEApi.instance().registries().players();
+        // read permissions
+        for (final IAEItemStack ais : this.inventory.getStoredItems()) {
+            final ItemStack is = ais.createItemStack();
+            final Item i = is.getItem();
+            if (i instanceof IBiometricCard) {
+                final IBiometricCard bc = (IBiometricCard) i;
+                bc.registerPermissions(new PlayerSecurityWrapper(playerPerms), pr, is);
+            }
+        }
 
-		// read permissions
-		for( final IAEItemStack ais : this.inventory.getStoredItems() )
-		{
-			final ItemStack is = ais.createItemStack();
-			final Item i = is.getItem();
-			if( i instanceof IBiometricCard )
-			{
-				final IBiometricCard bc = (IBiometricCard) i;
-				bc.registerPermissions( new PlayerSecurityWrapper( playerPerms ), pr, is );
-			}
-		}
+        // make sure thea admin is Boss.
+        playerPerms.put(this.getProxy().getNode().getPlayerID(), EnumSet.allOf(SecurityPermissions.class));
+    }
 
-		// make sure thea admin is Boss.
-		playerPerms.put( this.getProxy().getNode().getPlayerID(), EnumSet.allOf( SecurityPermissions.class ) );
-	}
+    @Override
+    public boolean isSecurityEnabled() {
+        return this.isActive && this.getProxy().isActive();
+    }
 
-	@Override
-	public boolean isSecurityEnabled()
-	{
-		return this.isActive && this.getProxy().isActive();
-	}
+    @Override
+    public int getOwner() {
+        return this.getProxy().getNode().getPlayerID();
+    }
 
-	@Override
-	public int getOwner()
-	{
-		return this.getProxy().getNode().getPlayerID();
-	}
+    @Override
+    public AEColor getColor() {
+        return this.paintedColor;
+    }
 
-	@Override
-	public AEColor getColor()
-	{
-		return this.paintedColor;
-	}
+    @Override
+    public boolean recolourBlock(final EnumFacing side, final AEColor newPaintedColor, final EntityPlayer who) {
+        if (this.paintedColor == newPaintedColor) {
+            return false;
+        }
 
-	@Override
-	public boolean recolourBlock( final EnumFacing side, final AEColor newPaintedColor, final EntityPlayer who )
-	{
-		if( this.paintedColor == newPaintedColor )
-		{
-			return false;
-		}
+        this.paintedColor = newPaintedColor;
+        this.saveChanges();
+        this.markForUpdate();
+        return true;
+    }
 
-		this.paintedColor = newPaintedColor;
-		this.saveChanges();
-		this.markForUpdate();
-		return true;
-	}
-
-	public AppEngInternalInventory getConfigSlot()
-	{
-		return this.configSlot;
-	}
+    public AppEngInternalInventory getConfigSlot() {
+        return this.configSlot;
+    }
 }

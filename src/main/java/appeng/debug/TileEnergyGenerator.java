@@ -18,7 +18,6 @@
 
 package appeng.debug;
 
-
 import java.util.EnumSet;
 
 import javax.annotation.Nullable;
@@ -34,106 +33,88 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import appeng.tile.AEBaseTile;
 
+public class TileEnergyGenerator extends AEBaseTile implements ITickable, IEnergyStorage {
+    /**
+     * The base energy injected each tick. Adjacent TileEnergyGenerators will
+     * increase it to pow(base, #generators).
+     */
+    private static final int BASE_ENERGY = 8;
 
-public class TileEnergyGenerator extends AEBaseTile implements ITickable, IEnergyStorage
-{
-	/**
-	 * The base energy injected each tick.
-	 * Adjacent TileEnergyGenerators will increase it to pow(base, #generators).
-	 */
-	private static final int BASE_ENERGY = 8;
+    @Override
+    public void update() {
+        int tier = 1;
+        final EnumSet<EnumFacing> validEnergyReceivers = EnumSet.noneOf(EnumFacing.class);
 
-	@Override
-	public void update()
-	{
-		int tier = 1;
-		final EnumSet<EnumFacing> validEnergyReceivers = EnumSet.noneOf( EnumFacing.class );
+        for (EnumFacing facing : EnumFacing.values()) {
+            final TileEntity te = this.getWorld().getTileEntity(this.getPos().offset(facing));
 
-		for( EnumFacing facing : EnumFacing.values() )
-		{
-			final TileEntity te = this.getWorld().getTileEntity( this.getPos().offset( facing ) );
+            if (te instanceof TileEnergyGenerator) {
+                tier++;
+            }
 
-			if( te instanceof TileEnergyGenerator )
-			{
-				tier++;
-			}
+            if (te != null && te.hasCapability(CapabilityEnergy.ENERGY, facing.getOpposite())) {
+                validEnergyReceivers.add(facing);
+            }
 
-			if( te != null && te.hasCapability( CapabilityEnergy.ENERGY, facing.getOpposite() ) )
-			{
-				validEnergyReceivers.add( facing );
-			}
+        }
 
-		}
+        final int energyToInsert = IntMath.pow(BASE_ENERGY, tier);
 
-		final int energyToInsert = IntMath.pow( BASE_ENERGY, tier );
+        for (EnumFacing facing : validEnergyReceivers) {
+            final TileEntity te = this.getWorld().getTileEntity(this.getPos().offset(facing));
+            final IEnergyStorage cap = te.getCapability(CapabilityEnergy.ENERGY, facing.getOpposite());
 
-		for( EnumFacing facing : validEnergyReceivers )
-		{
-			final TileEntity te = this.getWorld().getTileEntity( this.getPos().offset( facing ) );
-			final IEnergyStorage cap = te.getCapability( CapabilityEnergy.ENERGY, facing.getOpposite() );
+            if (cap.canReceive()) {
 
-			if( cap.canReceive() )
-			{
+                cap.receiveEnergy(energyToInsert, false);
+            }
+        }
+    }
 
-				cap.receiveEnergy( energyToInsert, false );
-			}
-		}
-	}
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return true;
+        }
+        return super.hasCapability(capability, facing);
+    }
 
-	@Override
-	public boolean hasCapability( Capability<?> capability, @Nullable EnumFacing facing )
-	{
-		if( capability == CapabilityEnergy.ENERGY )
-		{
-			return true;
-		}
-		return super.hasCapability( capability, facing );
-	}
+    @Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return (T) this;
+        }
+        return super.getCapability(capability, facing);
+    }
 
-	@Override
-	@Nullable
-	public <T> T getCapability( Capability<T> capability, @Nullable EnumFacing facing )
-	{
-		if( capability == CapabilityEnergy.ENERGY )
-		{
-			return (T) this;
-		}
-		return super.getCapability( capability, facing );
-	}
+    @Override
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+        return 0;
+    }
 
-	@Override
-	public int receiveEnergy( int maxReceive, boolean simulate )
-	{
-		return 0;
-	}
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        return maxExtract;
+    }
 
-	@Override
-	public int extractEnergy( int maxExtract, boolean simulate )
-	{
-		return maxExtract;
-	}
+    @Override
+    public int getEnergyStored() {
+        return Integer.MAX_VALUE;
+    }
 
-	@Override
-	public int getEnergyStored()
-	{
-		return Integer.MAX_VALUE;
-	}
+    @Override
+    public int getMaxEnergyStored() {
+        return Integer.MAX_VALUE;
+    }
 
-	@Override
-	public int getMaxEnergyStored()
-	{
-		return Integer.MAX_VALUE;
-	}
+    @Override
+    public boolean canExtract() {
+        return true;
+    }
 
-	@Override
-	public boolean canExtract()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean canReceive()
-	{
-		return false;
-	}
+    @Override
+    public boolean canReceive() {
+        return false;
+    }
 }

@@ -18,21 +18,15 @@
 
 package appeng.integration.abstraction;
 
-
 import net.minecraft.item.ItemStack;
 
 import appeng.integration.IIntegrationModule;
 
+public interface IRC extends IIntegrationModule {
 
-public interface IRC extends IIntegrationModule
-{
+    default void rockCrusher(ItemStack input, ItemStack output) {}
 
-	default void rockCrusher( ItemStack input, ItemStack output )
-	{
-	}
-
-	class Stub extends IIntegrationModule.Stub implements IRC
-	{
-	}
+    class Stub extends IIntegrationModule.Stub implements IRC {
+    }
 
 }

@@ -18,7 +18,6 @@
 
 package appeng.integration.modules.theoneprobe.part;
 
-
 import java.util.Optional;
 
 import net.minecraft.tileentity.TileEntity;
@@ -31,25 +30,20 @@ import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.parts.SelectedPart;
 
+public final class PartAccessor {
 
-public final class PartAccessor
-{
+    public Optional<IPart> getMaybePart(final TileEntity te, final IProbeHitData data) {
+        if (te instanceof IPartHost) {
+            BlockPos pos = data.getPos();
+            final Vec3d position = data.getHitVec().addVector(-pos.getX(), -pos.getY(), -pos.getZ());
+            final IPartHost host = (IPartHost) te;
+            final SelectedPart sp = host.selectPart(position);
 
-	public Optional<IPart> getMaybePart( final TileEntity te, final IProbeHitData data )
-	{
-		if( te instanceof IPartHost )
-		{
-			BlockPos pos = data.getPos();
-			final Vec3d position = data.getHitVec().addVector( -pos.getX(), -pos.getY(), -pos.getZ() );
-			final IPartHost host = (IPartHost) te;
-			final SelectedPart sp = host.selectPart( position );
+            if (sp.part != null) {
+                return Optional.of(sp.part);
+            }
+        }
 
-			if( sp.part != null )
-			{
-				return Optional.of( sp.part );
-			}
-		}
-
-		return Optional.empty();
-	}
+        return Optional.empty();
+    }
 }

@@ -23,12 +23,10 @@
 
 package appeng.api.features;
 
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 import net.minecraft.item.ItemStack;
-
 
 /**
  * Builder for a grinder recipe.
@@ -39,77 +37,76 @@ import net.minecraft.item.ItemStack;
  * @version rv5
  * @since rv5
  */
-public interface IGrinderRecipeBuilder
-{
+public interface IGrinderRecipeBuilder {
 
-	/**
-	 * Creates an grinder recipe with inputs.
-	 * Needs to be invoked.
-	 *
-	 * @param input new input for the recipe
-	 *
-	 * @return currently used builder
-	 */
-	@Nonnull
-	IGrinderRecipeBuilder withInput( @Nonnull ItemStack input );
+    /**
+     * Creates an grinder recipe with inputs. Needs to be invoked.
+     *
+     * @param input new input for the recipe
+     *
+     * @return currently used builder
+     */
+    @Nonnull
+    IGrinderRecipeBuilder withInput(@Nonnull ItemStack input);
 
-	/**
-	 * Creates an grinder recipe with output.
-	 * Needs to be invoked.
-	 *
-	 * @param output new output for the recipe
-	 *
-	 * @return currently used builder
-	 */
-	@Nonnull
-	IGrinderRecipeBuilder withOutput( @Nonnull ItemStack output );
+    /**
+     * Creates an grinder recipe with output. Needs to be invoked.
+     *
+     * @param output new output for the recipe
+     *
+     * @return currently used builder
+     */
+    @Nonnull
+    IGrinderRecipeBuilder withOutput(@Nonnull ItemStack output);
 
-	/**
-	 * Creates an grinder recipe with the first optional output and its chance.
-	 *
-	 * @param optional new first optional for the recipe
-	 * @param chance chance for the first optional output, must be within 0.0 - 1.0
-	 *
-	 * @return currently used builder
-	 */
-	@Nonnull
-	IGrinderRecipeBuilder withFirstOptional( @Nonnull ItemStack optional, float chance );
+    /**
+     * Creates an grinder recipe with the first optional output and its chance.
+     *
+     * @param optional new first optional for the recipe
+     * @param chance   chance for the first optional output, must be within 0.0 -
+     *                 1.0
+     *
+     * @return currently used builder
+     */
+    @Nonnull
+    IGrinderRecipeBuilder withFirstOptional(@Nonnull ItemStack optional, float chance);
 
-	/**
-	 * Creates an grinder recipe with the second optional output and its chance.
-	 *
-	 * @param optional new second optional for the recipe
-	 * @param chance chance for the second optional output, must be within 0.0 - 1.0
-	 *
-	 * @return currently used builder
-	 */
-	@Nonnull
-	IGrinderRecipeBuilder withSecondOptional( @Nonnull ItemStack optional, float chance );
+    /**
+     * Creates an grinder recipe with the second optional output and its chance.
+     *
+     * @param optional new second optional for the recipe
+     * @param chance   chance for the second optional output, must be within 0.0 -
+     *                 1.0
+     *
+     * @return currently used builder
+     */
+    @Nonnull
+    IGrinderRecipeBuilder withSecondOptional(@Nonnull ItemStack optional, float chance);
 
-	/**
-	 * Creates an grinder recipe with the amount of turns as cost.
-	 * 
-	 * Defaults to 8 when not called.
-	 *
-	 * @param turns new turns for the recipe, must be > 0
-	 *
-	 * @return currently used builder
-	 */
-	@Nonnull
-	IGrinderRecipeBuilder withTurns( @Nonnegative int turns );
+    /**
+     * Creates an grinder recipe with the amount of turns as cost.
+     * 
+     * Defaults to 8 when not called.
+     *
+     * @param turns new turns for the recipe, must be > 0
+     *
+     * @return currently used builder
+     */
+    @Nonnull
+    IGrinderRecipeBuilder withTurns(@Nonnegative int turns);
 
-	/**
-	 * Finalizes the process of making the recipe.
-	 * Needs to be invoked to fetch grinder recipe.
-	 *
-	 * @return valid grinder recipe
-	 *
-	 * @throws IllegalStateException when input is not defined
-	 * @throws IllegalStateException when input has no size
-	 * @throws IllegalStateException when output is not defined
-	 * @throws IllegalStateException when both optionals are not defined
-	 * @throws IllegalStateException when process type is not defined
-	 */
-	@Nonnull
-	IGrinderRecipe build();
+    /**
+     * Finalizes the process of making the recipe. Needs to be invoked to fetch
+     * grinder recipe.
+     *
+     * @return valid grinder recipe
+     *
+     * @throws IllegalStateException when input is not defined
+     * @throws IllegalStateException when input has no size
+     * @throws IllegalStateException when output is not defined
+     * @throws IllegalStateException when both optionals are not defined
+     * @throws IllegalStateException when process type is not defined
+     */
+    @Nonnull
+    IGrinderRecipe build();
 }

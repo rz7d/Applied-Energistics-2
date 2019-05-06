@@ -18,7 +18,6 @@
 
 package appeng.debug;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,52 +33,46 @@ import appeng.core.AELog;
 import appeng.items.AEBaseItem;
 import appeng.util.Platform;
 
+public class ToolEraser extends AEBaseItem {
 
-public class ToolEraser extends AEBaseItem
-{
+    private static final int BLOCK_ERASE_LIMIT = 90000;
 
-	private static final int BLOCK_ERASE_LIMIT = 90000;
+    @Override
+    public EnumActionResult onItemUseFirst(final EntityPlayer player, final World world, final BlockPos pos,
+            final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
+        if (Platform.isClient()) {
+            return EnumActionResult.PASS;
+        }
 
-	@Override
-	public EnumActionResult onItemUseFirst( final EntityPlayer player, final World world, final BlockPos pos, final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand )
-	{
-		if( Platform.isClient() )
-		{
-			return EnumActionResult.PASS;
-		}
+        final IBlockState state = world.getBlockState(pos);
 
-		final IBlockState state = world.getBlockState( pos );
+        List<BlockPos> next = new ArrayList<>();
+        next.add(pos);
 
-		List<BlockPos> next = new ArrayList<>();
-		next.add( pos );
+        int blocks = 0;
+        while (blocks < BLOCK_ERASE_LIMIT && !next.isEmpty()) {
+            final List<BlockPos> c = next;
+            next = new ArrayList<>();
 
-		int blocks = 0;
-		while( blocks < BLOCK_ERASE_LIMIT && !next.isEmpty() )
-		{
-			final List<BlockPos> c = next;
-			next = new ArrayList<>();
+            for (final BlockPos wc : c) {
+                final IBlockState c_state = world.getBlockState(wc);
 
-			for( final BlockPos wc : c )
-			{
-				final IBlockState c_state = world.getBlockState( wc );
+                if (state == c_state) {
+                    blocks++;
+                    world.setBlockToAir(wc);
 
-				if( state == c_state )
-				{
-					blocks++;
-					world.setBlockToAir( wc );
+                    next.add(wc.add(1, 0, 0));
+                    next.add(wc.add(-1, 0, 0));
+                    next.add(wc.add(0, 1, 0));
+                    next.add(wc.add(0, -1, 0));
+                    next.add(wc.add(0, 0, 1));
+                    next.add(wc.add(0, 0, -1));
+                }
+            }
+        }
 
-					next.add( wc.add( 1, 0, 0 ) );
-					next.add( wc.add( -1, 0, 0 ) );
-					next.add( wc.add( 0, 1, 0 ) );
-					next.add( wc.add( 0, -1, 0 ) );
-					next.add( wc.add( 0, 0, 1 ) );
-					next.add( wc.add( 0, 0, -1 ) );
-				}
-			}
-		}
+        AELog.info("Delete " + blocks + " blocks");
 
-		AELog.info( "Delete " + blocks + " blocks" );
-
-		return EnumActionResult.SUCCESS;
-	}
+        return EnumActionResult.SUCCESS;
+    }
 }

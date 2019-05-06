@@ -18,11 +18,8 @@
 
 package appeng.core.api;
 
-
 import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
 
-
-public interface IIMCProcessor
-{
-	void process( IMCMessage m );
+public interface IIMCProcessor {
+    void process(IMCMessage m);
 }

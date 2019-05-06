@@ -18,7 +18,6 @@
 
 package appeng.core.features;
 
-
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -30,61 +29,50 @@ import net.minecraft.item.ItemStack;
 
 import appeng.api.definitions.IItemDefinition;
 
+public final class DamagedItemDefinition implements IItemDefinition {
+    private final String identifier;
+    private final Optional<IStackSrc> source;
 
-public final class DamagedItemDefinition implements IItemDefinition
-{
-	private final String identifier;
-	private final Optional<IStackSrc> source;
+    public DamagedItemDefinition(@Nonnull final String identifier, @Nonnull final IStackSrc source) {
+        this.identifier = Preconditions.checkNotNull(identifier);
+        Preconditions.checkNotNull(source);
 
-	public DamagedItemDefinition( @Nonnull final String identifier, @Nonnull final IStackSrc source )
-	{
-		this.identifier = Preconditions.checkNotNull( identifier );
-		Preconditions.checkNotNull( source );
+        if (source.isEnabled()) {
+            this.source = Optional.of(source);
+        } else {
+            this.source = Optional.empty();
+        }
+    }
 
-		if( source.isEnabled() )
-		{
-			this.source = Optional.of( source );
-		}
-		else
-		{
-			this.source = Optional.empty();
-		}
-	}
+    @Nonnull
+    @Override
+    public String identifier() {
+        return this.identifier;
+    }
 
-	@Nonnull
-	@Override
-	public String identifier()
-	{
-		return this.identifier;
-	}
+    @Override
+    public Optional<Item> maybeItem() {
+        return this.source.map(IStackSrc::getItem);
+    }
 
-	@Override
-	public Optional<Item> maybeItem()
-	{
-		return this.source.map( IStackSrc::getItem );
-	}
+    @Override
+    public Optional<ItemStack> maybeStack(final int stackSize) {
+        return this.source.map(input -> input.stack(stackSize));
+    }
 
-	@Override
-	public Optional<ItemStack> maybeStack( final int stackSize )
-	{
-		return this.source.map( input -> input.stack( stackSize ) );
-	}
+    @Override
+    public boolean isEnabled() {
+        return this.source.isPresent();
+    }
 
-	@Override
-	public boolean isEnabled()
-	{
-		return this.source.isPresent();
-	}
+    @Override
+    public boolean isSameAs(final ItemStack comparableStack) {
+        if (comparableStack.isEmpty()) {
+            return false;
+        }
 
-	@Override
-	public boolean isSameAs( final ItemStack comparableStack )
-	{
-		if( comparableStack.isEmpty() )
-		{
-			return false;
-		}
-
-		return this.isEnabled() && comparableStack.getItem() == this.source.get().getItem() && comparableStack.getItemDamage() == this.source.get().getDamage();
-	}
+        return this.isEnabled() && comparableStack.getItem() == this.source.get().getItem()
+                && comparableStack.getItemDamage() == this.source.get().getDamage();
+    }
 
 }

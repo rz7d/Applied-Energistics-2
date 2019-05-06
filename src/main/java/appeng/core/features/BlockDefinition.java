@@ -18,7 +18,6 @@
 
 package appeng.core.features;
 
-
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
@@ -31,40 +30,33 @@ import net.minecraft.world.IBlockAccess;
 
 import appeng.api.definitions.IBlockDefinition;
 
+public class BlockDefinition extends ItemDefinition implements IBlockDefinition {
+    private final Optional<Block> block;
 
-public class BlockDefinition extends ItemDefinition implements IBlockDefinition
-{
-	private final Optional<Block> block;
+    public BlockDefinition(String registryName, Block block, ItemBlock item) {
+        super(registryName, item);
+        this.block = Optional.ofNullable(block);
+    }
 
-	public BlockDefinition( String registryName, Block block, ItemBlock item )
-	{
-		super( registryName, item );
-		this.block = Optional.ofNullable( block );
-	}
+    @Override
+    public final Optional<Block> maybeBlock() {
+        return this.block;
+    }
 
-	@Override
-	public final Optional<Block> maybeBlock()
-	{
-		return this.block;
-	}
+    @Override
+    public final Optional<ItemBlock> maybeItemBlock() {
+        return this.block.map(ItemBlock::new);
+    }
 
-	@Override
-	public final Optional<ItemBlock> maybeItemBlock()
-	{
-		return this.block.map( ItemBlock::new );
-	}
+    @Override
+    public final Optional<ItemStack> maybeStack(int stackSize) {
+        Preconditions.checkArgument(stackSize > 0);
 
-	@Override
-	public final Optional<ItemStack> maybeStack( int stackSize )
-	{
-		Preconditions.checkArgument( stackSize > 0 );
+        return this.block.map(b -> new ItemStack(b, stackSize));
+    }
 
-		return this.block.map( b -> new ItemStack( b, stackSize ) );
-	}
-
-	@Override
-	public final boolean isSameAs( final IBlockAccess world, final BlockPos pos )
-	{
-		return this.block.isPresent() && world.getBlockState( pos ).getBlock() == this.block.get();
-	}
+    @Override
+    public final boolean isSameAs(final IBlockAccess world, final BlockPos pos) {
+        return this.block.isPresent() && world.getBlockState(pos).getBlock() == this.block.get();
+    }
 }
