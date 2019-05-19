@@ -36,131 +36,176 @@ import appeng.api.storage.data.IAEItemStack;
 import appeng.api.util.AEColor;
 import appeng.util.item.AEItemStack;
 
-public class TileCraftingMonitorTile extends TileCraftingTile implements IColorableTile {
 
-    @SideOnly(Side.CLIENT)
-    private Integer dspList;
+public class TileCraftingMonitorTile extends TileCraftingTile implements IColorableTile
+{
 
-    @SideOnly(Side.CLIENT)
-    private boolean updateList;
+	@SideOnly( Side.CLIENT )
+	private Integer dspList;
 
-    private IAEItemStack dspPlay;
-    private AEColor paintedColor = AEColor.TRANSPARENT;
+	@SideOnly( Side.CLIENT )
+	private boolean updateList;
 
-    @Override
-    protected boolean readFromStream(final ByteBuf data) throws IOException {
-        final boolean c = super.readFromStream(data);
-        final AEColor oldPaintedColor = this.paintedColor;
-        this.paintedColor = AEColor.values()[data.readByte()];
+	private IAEItemStack dspPlay;
+	private AEColor paintedColor = AEColor.TRANSPARENT;
 
-        final boolean hasItem = data.readBoolean();
+	@Override
+	protected boolean readFromStream( final ByteBuf data ) throws IOException
+	{
+		final boolean c = super.readFromStream( data );
+		final AEColor oldPaintedColor = this.paintedColor;
+		this.paintedColor = AEColor.values()[data.readByte()];
 
-        if (hasItem) {
-            this.dspPlay = AEItemStack.fromPacket(data);
-        } else {
-            this.dspPlay = null;
-        }
+		final boolean hasItem = data.readBoolean();
 
-        this.setUpdateList(true);
-        return oldPaintedColor != this.paintedColor || c; // tesr!
-    }
+		if( hasItem )
+		{
+			this.dspPlay = AEItemStack.fromPacket( data );
+		}
+		else
+		{
+			this.dspPlay = null;
+		}
 
-    @Override
-    protected void writeToStream(final ByteBuf data) throws IOException {
-        super.writeToStream(data);
-        data.writeByte(this.paintedColor.ordinal());
+		this.setUpdateList( true );
+		return oldPaintedColor != this.paintedColor || c; // tesr!
+	}
 
-        if (this.dspPlay == null) {
-            data.writeBoolean(false);
-        } else {
-            data.writeBoolean(true);
-            this.dspPlay.writeToPacket(data);
-        }
-    }
+	@Override
+	protected void writeToStream( final ByteBuf data ) throws IOException
+	{
+		super.writeToStream( data );
+		data.writeByte( this.paintedColor.ordinal() );
 
-    @Override
-    public void readFromNBT(final NBTTagCompound data) {
-        super.readFromNBT(data);
-        if (data.hasKey("paintedColor")) {
-            this.paintedColor = AEColor.values()[data.getByte("paintedColor")];
-        }
-    }
+		if( this.dspPlay == null )
+		{
+			data.writeBoolean( false );
+		}
+		else
+		{
+			data.writeBoolean( true );
+			this.dspPlay.writeToPacket( data );
+		}
+	}
 
-    @Override
-    public NBTTagCompound writeToNBT(final NBTTagCompound data) {
-        super.writeToNBT(data);
-        data.setByte("paintedColor", (byte) this.paintedColor.ordinal());
-        return data;
-    }
+	@Override
+	public void readFromNBT( final NBTTagCompound data )
+	{
+		super.readFromNBT( data );
+		if( data.hasKey( "paintedColor" ) )
+		{
+			this.paintedColor = AEColor.values()[data.getByte( "paintedColor" )];
+		}
+	}
 
-    @Override
-    public boolean isAccelerator() {
-        return false;
-    }
+	@Override
+	public NBTTagCompound writeToNBT( final NBTTagCompound data )
+	{
+		super.writeToNBT( data );
+		data.setByte( "paintedColor", (byte) this.paintedColor.ordinal() );
+		return data;
+	}
 
-    @Override
-    public boolean isStatus() {
-        return true;
-    }
+	@Override
+	public boolean isAccelerator()
+	{
+		return false;
+	}
 
-    public void setJob(final IAEItemStack is) {
-        if ((is == null) != (this.dspPlay == null)) {
-            this.dspPlay = is == null ? null : is.copy();
-            this.markForUpdate();
-        } else if (is != null && this.dspPlay != null) {
-            if (is.getStackSize() != this.dspPlay.getStackSize()) {
-                this.dspPlay = is.copy();
-                this.markForUpdate();
-            }
-        }
-    }
+	@Override
+	public boolean is8coreAccelerator() {
+		return false;
+	}
 
-    public IAEItemStack getJobProgress() {
-        return this.dspPlay; // AEItemStack.create( new ItemStack( Items.DIAMOND, 64 ) );
-    }
+	@Override
+	public boolean is64coreAccelerator() {
+		return false;
+	}
 
-    @Override
-    public boolean requiresTESR() {
-        return this.dspPlay != null;
-    }
+	@Override
+	public boolean is512coreAccelerator() {
+		return false;
+	}
 
-    @Override
-    public AEColor getColor() {
-        return this.paintedColor;
-    }
+	@Override
+	public boolean isStatus()
+	{
+		return true;
+	}
 
-    @Override
-    public boolean recolourBlock(final EnumFacing side, final AEColor newPaintedColor, final EntityPlayer who) {
-        if (this.paintedColor == newPaintedColor) {
-            return false;
-        }
+	public void setJob( final IAEItemStack is )
+	{
+		if( ( is == null ) != ( this.dspPlay == null ) )
+		{
+			this.dspPlay = is == null ? null : is.copy();
+			this.markForUpdate();
+		}
+		else if( is != null && this.dspPlay != null )
+		{
+			if( is.getStackSize() != this.dspPlay.getStackSize() )
+			{
+				this.dspPlay = is.copy();
+				this.markForUpdate();
+			}
+		}
+	}
 
-        this.paintedColor = newPaintedColor;
-        this.saveChanges();
-        this.markForUpdate();
-        return true;
-    }
+	public IAEItemStack getJobProgress()
+	{
+		return this.dspPlay; // AEItemStack.create( new ItemStack( Items.DIAMOND, 64 ) );
+	}
 
-    public Integer getDisplayList() {
-        return this.dspList;
-    }
+	@Override
+	public boolean requiresTESR()
+	{
+		return this.dspPlay != null;
+	}
 
-    public void setDisplayList(final Integer dspList) {
-        this.dspList = dspList;
-    }
+	@Override
+	public AEColor getColor()
+	{
+		return this.paintedColor;
+	}
 
-    public boolean isUpdateList() {
-        return this.updateList;
-    }
+	@Override
+	public boolean recolourBlock( final EnumFacing side, final AEColor newPaintedColor, final EntityPlayer who )
+	{
+		if( this.paintedColor == newPaintedColor )
+		{
+			return false;
+		}
 
-    public void setUpdateList(final boolean updateList) {
-        this.updateList = updateList;
-    }
+		this.paintedColor = newPaintedColor;
+		this.saveChanges();
+		this.markForUpdate();
+		return true;
+	}
 
-    @Override
-    protected ItemStack getItemFromTile(final Object obj) {
-        final Optional<ItemStack> is = AEApi.instance().definitions().blocks().craftingMonitor().maybeStack(1);
+	public Integer getDisplayList()
+	{
+		return this.dspList;
+	}
 
-        return is.orElseGet(() -> super.getItemFromTile(obj));
-    }
+	public void setDisplayList( final Integer dspList )
+	{
+		this.dspList = dspList;
+	}
+
+	public boolean isUpdateList()
+	{
+		return this.updateList;
+	}
+
+	public void setUpdateList( final boolean updateList )
+	{
+		this.updateList = updateList;
+	}
+
+	@Override
+	protected ItemStack getItemFromTile( final Object obj )
+	{
+		final Optional<ItemStack> is = AEApi.instance().definitions().blocks().craftingMonitor().maybeStack( 1 );
+
+		return is.orElseGet( () -> super.getItemFromTile( obj ) );
+	}
 }
