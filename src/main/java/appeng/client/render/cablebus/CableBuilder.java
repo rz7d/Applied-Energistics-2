@@ -455,17 +455,24 @@ class CableBuilder {
         cubeBuilder.setTexture(texture);
     }
 
-    public void addDenseSmartConnection(EnumFacing facing, AEColor cableColor, AECableType connectionType,
-            boolean cableBusAdjacent, int channels, List<BakedQuad> quadsOut) {
-        // Dense cables only render their connections as dense if the adjacent blocks
-        // actually wants that
-        if (connectionType == AECableType.SMART) {
-            this.addSmartConnection(facing, cableColor, connectionType, cableBusAdjacent, channels, quadsOut);
-            return;
-        } else if (connectionType == AECableType.COVERED || connectionType == AECableType.GLASS) {
-            this.addCoveredConnection(facing, cableColor, connectionType, cableBusAdjacent, quadsOut);
-            return;
-        }
+	public void addDenseSmartConnection( EnumFacing facing, AEColor cableColor, AECableType connectionType, boolean cableBusAdjacent, int channels, List<BakedQuad> quadsOut )
+	{
+		// Dense cables only render their connections as dense if the adjacent blocks actually wants that
+		if( connectionType == AECableType.SMART )
+		{
+			this.addSmartConnection( facing, cableColor, connectionType, cableBusAdjacent, channels, quadsOut );
+			return;
+		}
+		else if( connectionType == AECableType.COVERED || connectionType == AECableType.GLASS )
+		{
+			this.addCoveredConnection( facing, cableColor, connectionType, cableBusAdjacent, quadsOut );
+			return;
+		}
+		else if( connectionType == AECableType.DENSE_COVERED )
+		{
+			this.addDenseCoveredConnection( facing, cableColor, connectionType, cableBusAdjacent, quadsOut );
+			return;
+		}
 
         CubeBuilder cubeBuilder = new CubeBuilder(this.format, quadsOut);
 
